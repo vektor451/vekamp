@@ -13,6 +13,8 @@ elseif(UNIX)
     set(LIB_PATH /libs/linux-x86_64)
 endif()
 
+find_package(PkgConfig REQUIRED)
+
 # BASS ------------------------------------------------------------------------
 set(BASS_DIR       ${VENDOR_DIR}/bass24)
 set(BASSALAC_DIR   ${VENDOR_DIR}/bassalac24)
@@ -28,7 +30,7 @@ set(BASS_INCLUDE_DIRS
     ${BASSOPUS_DIR};
 )
 
-message("== Init BASS ==")
+message("==  Init BASS  ==")
 message("Looking in dir: ${BASS_DIR}${LIB_PATH}")
 
 add_library(BASS        SHARED IMPORTED) 
@@ -67,10 +69,19 @@ elseif (UNIX)
     )    
  endif()
 
+# TagLib ----------------------------------------------------------------------
+#message("== Init TagLib ==")
+#set(USER_HOME_DIR $ENV{USERPROFILE})
+
+#find_package(ZLIB)
+#message("Looking in dir: ${USER_HOME_DIR}\\projects\\taglib\\src\\msvs_vcpkg_build")
+#set(CMAKE_PREFIX_PATH ${USER_HOME_DIR}\\projects\\taglib\\src\\msvs_vcpkg_build)
+#pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
+
 # GTK4 ------------------------------------------------------------------------
 set(GTK_WIN_PATH C:/gtk-build/gtk/x64/release)
 
-message("== Init GTK4 ==")
+message("==  Init GTK4  ==")
 
 if(WIN32)
     set(CMAKE_PREFIX_PATH ${GTK_WIN_PATH})
@@ -78,7 +89,6 @@ if(WIN32)
 endif()
 
 # Use the package PkgConfig to detect GTK+ headers/library files
-find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK4 REQUIRED gtk4)
 
 # Setup CMake to use GTK+, tell the compiler where to look for headers
@@ -91,16 +101,21 @@ set(CMAKE_SYSTEM_PREFIX_PATH ${GTK4_LIBRARY_DIRS})
 add_definitions(${GTK4_CFLAGS_OTHER})
 
 # MAIN ------------------------------------------------------------------------
-message ("==   MAIN   ==")
+message ("==    MAIN    ==")
 
 add_executable(${PROJECT_NAME})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
+# Link GTK4
 target_link_libraries(${PROJECT_NAME} ${GTK4_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${GTK4_INCLUDE_DIRS})
+# Link BASS
 target_link_libraries(${PROJECT_NAME} ${BASS_LIB_PATHS}) 
 target_include_directories(${PROJECT_NAME} PRIVATE ${BASS_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${GTK4_INCLUDE_DIRS})
+# Link TagLib
+#target_link_libraries(${PROJECT_NAME} TagLib::tag)
+#target_link_libraries(${PROJECT_NAME} TagLib::tag_c)
 
 target_sources(${PROJECT_NAME} PRIVATE
     src/utils.cpp
