@@ -78,28 +78,6 @@ elseif (UNIX)
 #set(CMAKE_PREFIX_PATH ${USER_HOME_DIR}\\projects\\taglib\\src\\msvs_vcpkg_build)
 #pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 
-# GTK4 ------------------------------------------------------------------------
-set(GTK_WIN_PATH C:/gtk-build/gtk/x64/release)
-
-message("==  Init GTK4  ==")
-
-if(WIN32)
-    set(CMAKE_PREFIX_PATH ${GTK_WIN_PATH})
-    message("Looking in dir: ${GTK_WIN_PATH}")
-endif()
-
-# Use the package PkgConfig to detect GTK+ headers/library files
-pkg_check_modules(GTK4 REQUIRED gtk4)
-
-# Setup CMake to use GTK+, tell the compiler where to look for headers
-# and to the linker where to look for libraries
-include_directories(${GTK4_INCLUDE_DIRS})
-link_directories(${GTK4_LIBRARY_DIRS})
-set(CMAKE_SYSTEM_PREFIX_PATH ${GTK4_LIBRARY_DIRS})
-
-# Add other flags to the compiler
-add_definitions(${GTK4_CFLAGS_OTHER})
-
 # MAIN ------------------------------------------------------------------------
 message ("==    MAIN    ==")
 
@@ -107,9 +85,6 @@ add_executable(${PROJECT_NAME})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
-# Link GTK4
-target_link_libraries(${PROJECT_NAME} ${GTK4_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${GTK4_INCLUDE_DIRS})
 # Link BASS
 target_link_libraries(${PROJECT_NAME} ${BASS_LIB_PATHS}) 
 target_include_directories(${PROJECT_NAME} PRIVATE ${BASS_INCLUDE_DIRS})
