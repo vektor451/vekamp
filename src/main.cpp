@@ -10,6 +10,8 @@
 // libs and lib helpers
 #include "bassplayer.hpp"
 
+#include <QtWidgets>
+
 // globals, move this to it's own class eventually. 
 std::string FileName;
 
@@ -31,4 +33,15 @@ int main(int argc, char *argv[])
 	BASS::BASSPlayer::StartFilePlayback(FileName.c_str());
 	BASS::AudioFormat::StreamFormat format = BASS::AudioFormat::GetFormat(FileName);
 	printf("Format: %d", (int)format);
+
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    //QGuiApplication::
+
+    QApplication app(argc, argv);
+    QWidget window;
+    window.resize(320, 240);
+    window.show();
+    window.setWindowTitle(
+        QApplication::translate("toplevel", "Top-level widget"));
+    return app.exec();
 }

@@ -4,20 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/gtk-build/gtk/x64/release/include/gtk-4.0/**",
-                "C:/gtk-build/gtk/x64/release/include/pango-1.0/**",
-                "C:/gtk-build/gtk/x64/release/include/fribidi/**",
-                "C:/gtk-build/gtk/x64/release/include/harfbuzz/**",
-                "C:/gtk-build/gtk/x64/release/include/gdk-pixbuf-2.0/**",
-                "C:/gtk-build/gtk/x64/release/include/cairo/**",
-                "C:/gtk-build/gtk/x64/release/include/freetype2/**",
-                "C:/gtk-build/gtk/x64/release/include/libpng16/**",
-                "C:/gtk-build/gtk/x64/release/include/pixman-1/**",
-                "C:/gtk-build/gtk/x64/release/include/graphene-1.0/**",
-                "C:/gtk-build/gtk/x64/release/lib/graphene-1.0/include/**",
-                "C:/gtk-build/gtk/x64/release/include/**",
-                "C:/gtk-build/gtk/x64/release/include/glib-2.0/**",
-                "C:/gtk-build/gtk/x64/release/lib/glib-2.0/include/**"
+                "C:/Qt/6.10.1/msvc2022_64/**"
             ],
             "defines": [
                 "_DEBUG",
