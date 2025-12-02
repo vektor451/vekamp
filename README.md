@@ -12,18 +12,14 @@ The main motivation for this project is to replace my currently used music playe
 
 ## Current Plans
 The plans for the current stage of development are as follows: 
-- [x] Basic media playback functionalities (Previous, Play/Pause, Next, Scrollbar, Duration/Position, Volume, Loop) (I can't really implement previous, next, and loop without first doing a track queue.)
-- [x] Implement different format extensions for BASS.
-- [ ] Track Queue
+- [ ] Basic media playback functionalities. (Play/Pause, Duration/Position, Volume)
+- [ ] Track Queue.
+- [ ] More playback functionalities. (Previous, Next, Loop Mode)
 - [ ] Read playlists.
-- [ ] Read metadata
+- [ ] Read metadata.
 
 ## Platforms
-This branch should compile for both Windows and Linux.
+This branch has only been tested on windows.
 
 ## Compiling
-To compile on windows, you need to use CMake with MSVC. You want to make sure GTK is first built by building it through [gvsbuild](https://github.com/wingtk/gvsbuild). The output directory for GTK should be C:\gtk-build, and the CMakeLists.txt assumes your GTK directories are the same as if they were build via gvsbuild. 
-
-For linux, you need to use CMake with GCC. You need to make sure you have the gtk-devel package is installed and up to date. From there, it should just work.
-
-Before compilation, it is important to place the necessary library files in their directories. Check the folders in `vendor` for more information. 
+Compilation is done via QtCreator 18 with Qt 6.10.0. 
