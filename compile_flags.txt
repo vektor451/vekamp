@@ -1,4 +1,0 @@
--I
-vendor/bass24
--I
-C:\Qt\6.9.1\msvc2022_64\include

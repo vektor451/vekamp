@@ -1,0 +1,12 @@
+<RCC>
+    <qresource>
+        <file>qtquickcontrols2.conf</file>
+        <file>VekAmp.qmlproject</file>
+        <file>VekAmp/Constants.qml</file>
+        <file>VekAmp/EventListModel.qml</file>
+        <file>VekAmp/EventListSimulator.qml</file>
+        <file>VekAmp/qmldir</file>
+        <file>VekAmpContent/App.qml</file>
+        <file>VekAmpContent/Screen01.qml</file>
+    </qresource>
+</RCC>
