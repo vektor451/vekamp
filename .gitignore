@@ -76,5 +76,4 @@ compile_commands.json
 *_qmlcache.qrc
 
 # Build dir
-/app/Build
-Build
+/VekAmp/build
