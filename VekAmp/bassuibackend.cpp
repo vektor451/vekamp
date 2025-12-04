@@ -3,7 +3,14 @@
 
 BASSUIBackend::BASSUIBackend(QObject *parent)
     : QObject{parent}
-{}
+{
+    // HACK: assigning like this is a bit hacky, but it works.
+    if(BASS::BASSPlayer::backendQObj)
+    {
+        qDebug("Multiple BASSUIBackends created: BASSPlayer already has a backendQObj set. Overriding existing backendQObj.");
+    }
+    BASS::BASSPlayer::backendQObj = this;
+}
 
 void BASSUIBackend::qClickMe()
 {
@@ -25,7 +32,8 @@ void BASSUIBackend::qPlayPause()
 
 QString BASSUIBackend::qGetTrackLenStr()
 {
-    return BASS::BASSPlayer::GetTrackLenStr();
+    std::string TrackProgress = BASS::BASSPlayer::GetTrackProgressStr(BASS::BASSPlayer::GetTrackProgressSecs());
+    return QString::fromStdString(TrackProgress);
 }
 
 qreal BASSUIBackend::qGetTrackLen()
@@ -33,6 +41,22 @@ qreal BASSUIBackend::qGetTrackLen()
     double trackProgress = BASS::BASSPlayer::GetTrackProgressSecs();
     double trackLen = BASS::BASSPlayer::GetTrackLenSecs();
     return trackProgress / trackLen;
+}
+
+void BASSUIBackend::qSetTrackProgress(qreal value)
+{
+    if(!BASS::BASSPlayer::IsScrolling())
+    {
+        BASS::BASSPlayer::SetPos(value * BASS::BASSPlayer::GetTrackLenSecs());
+    }
+}
+
+void BASSUIBackend::qSliderAdjustPause(bool pressed)
+{
+    if(pressed)
+        BASS::BASSPlayer::StartScroll();
+    else
+        BASS::BASSPlayer::EndScroll();
 }
 
 void BASSUIBackend::qSetVolume(qreal value)
@@ -43,5 +67,15 @@ void BASSUIBackend::qSetVolume(qreal value)
 qreal BASSUIBackend::qGetVolume()
 {
     return BASS::BASSPlayer::GetVolume();
+}
+
+QString BASSUIBackend::qGetTrackName()
+{
+    return QString::fromStdString(BASS::BASSPlayer::GetTrackName());
+}
+
+void BASSUIBackend::EmitTrackChange()
+{
+    emit trackChanged();
 }
 

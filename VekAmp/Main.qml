@@ -17,6 +17,9 @@ Window {
 
     BASSUIBackend{
         id: bassUI
+        onTrackChanged: {
+            trackName.text = qGetTrackName();
+        }
     }
 
     FileDialog{
@@ -160,11 +163,13 @@ Window {
                         Layout.fillWidth: true
                         RowLayout{
                             Label{
+                                id: trackName
                                 text: qsTr("Welcome to VekAmp!")
                                 Layout.fillWidth: true
                             }
 
                             Label{
+                                id: trackProgress
                                 text: qsTr("00:00 / 00:00")
                                 horizontalAlignment: Text.AlignRight
                                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -177,10 +182,53 @@ Window {
                             from: 0
                             value: 0
                             to: 1
+                            live: true
+
+                            onMoved: {
+                                bassUI.qSetTrackProgress(value);
+                            }
+
+                            MouseArea{
+                                id: progressArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+
+                                // TODO: Figure out way to pause playback while seeking
+                                onPressed:{
+                                    mouse.accepted = false;
+                                    //bassUI.qSliderAdjustPause(true)
+                                }
+
+                                TapHandler{
+                                    id: progressAreaTapHandler
+                                    onGrabChanged: {
+                                        "console.log: boo"
+                                    }
+                                }
+
+                                DragHandler{
+                                    id: progressAreaDragHandler
+                                    onGrabChanged: {
+                                        "console.log: boo"
+                                    }
+                                }
+                            }
 
                             Timer{
+                                id: progressTimer
                                 interval: 10; running: true; repeat: true
-                                onTriggered: progressSlider.value = bassUI.qGetTrackLen();
+                                onTriggered: {
+                                    if(!progressAreaTapHandler.pressed)
+                                    {
+                                        progressSlider.value = bassUI.qGetTrackLen();
+                                        trackProgress.text = bassUI.qGetTrackLenStr();
+                                        bassUI.qSliderAdjustPause(false)
+                                    }
+                                    else
+                                    {
+                                        //console.log(progressAreaTapHandler.pressed);
+                                    }
+                                }
                             }
                         }
                     }

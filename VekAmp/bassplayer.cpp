@@ -1,6 +1,7 @@
 #include "utils.hpp"
 #include "bassplayer.hpp"
 
+#include <filesystem>
 #include <string>
 #include <algorithm>
 #include <string>
@@ -95,6 +96,9 @@ namespace BASS
     std::string BASSPlayer::curFilePath 	= "";
     bool    	BASSPlayer::restartChannel 	= FALSE;
     bool    	BASSPlayer::isPlaying 		= FALSE;
+    bool    	BASSPlayer::isScrolling 	= TRUE;
+
+    BASSUIBackend * BASSPlayer::backendQObj = nullptr;
 
     void BASSPlayer::Init()
     {
@@ -186,6 +190,15 @@ namespace BASS
         qDebug("Playing back path: %s", fPath);
         SetCurFilePath(fPath);
 
+        if(backendQObj)
+        {
+            backendQObj->EmitTrackChange();
+        }
+        else
+        {
+            qDebug("backendQObj is a nullptr! Cannot emit signals.");
+        }
+
         trackLen = BASS_ChannelGetLength(curChannel, BASS_POS_BYTE);
         if(trackLen != -1)
         {
@@ -253,7 +266,9 @@ namespace BASS
 
 	void BASSPlayer::StartScroll()
 	{
-		if(isPlaying)
+        isScrolling = true;
+
+        if(isPlaying)
 		{
 			if(BASS_ChannelPause(curChannel))
             {
@@ -266,7 +281,7 @@ namespace BASS
 
 	void BASSPlayer::EndScroll()
 	{
-		if(isPlaying)
+        if(isPlaying && isScrolling)
 		{
 			if(BASS_ChannelPlay(curChannel, restartChannel))
             {
@@ -276,6 +291,8 @@ namespace BASS
             else
                 BASS::BASSError("Couldn't play file. (Incorrect path?)", FALSE);
 		}
+
+        isScrolling = false;
 	}
 
 	void BASSPlayer::SetPos(double pos)
@@ -330,12 +347,19 @@ namespace BASS
         curFilePath = fPath;
     }
 
+    std::string BASSPlayer::GetTrackName()
+    {
+        // Track name based on filename. This should be executed if there is no metadata to go off.
+        return std::filesystem::path(curFilePath).stem().string();
+    }
+
 	// One liner Setters/Getters
     float       BASSPlayer::GetVolume() 		{return volume;}
 	QWORD       BASSPlayer::GetTrackLen() 		{return trackLen;}
 	double      BASSPlayer::GetTrackLenSecs()	{return BASS_ChannelBytes2Seconds(curChannel, trackLen);}
     const char *BASSPlayer::GetTrackLenStr() 	{return trackLenStr.c_str();}
     const char *BASSPlayer::GetCurFilePath() 	{return curFilePath.c_str();}
-	bool        BASSPlayer::IsPlaying()			{return isPlaying;}
+    bool        BASSPlayer::IsPlaying()			{return isPlaying;}
+    bool        BASSPlayer::IsScrolling()       {return isScrolling;}
 
 }

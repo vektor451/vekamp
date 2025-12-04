@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bassuibackend.hpp"
+
 #include <map>
 #include <vector>
 #include <string>
@@ -7,7 +9,7 @@
 #include <bassalac.h> 
 #include <bassape.h> 
 #include <bassflac.h> 
-#include <bassopus.h> 
+#include <bassopus.h>
 
 namespace BASS 
 {
@@ -38,11 +40,10 @@ namespace BASS
             static StreamFormat GetFormat(std::string fPath);
     };
 
-    
-
     class BASSPlayer {
         public:
             // Variables
+            static BASSUIBackend * backendQObj;
 
             // Functions
             static void Init();
@@ -55,6 +56,7 @@ namespace BASS
             static void SetPos(double pos);
             static double GetTrackProgressSecs();
             static std::string GetTrackProgressStr(double pos);
+            static std::string GetTrackName();
 
             // Getters & setters.
             static void SetVolume(float vol);
@@ -65,6 +67,7 @@ namespace BASS
             static void SetCurFilePath(const char fPath[]);
             static const char *GetCurFilePath();
             static bool IsPlaying();
+            static bool IsScrolling();
         
         private:
             // Varibales
@@ -73,6 +76,7 @@ namespace BASS
             static std::string trackLenStr;
             static std::string curFilePath;
             static bool isPlaying;
+            static bool isScrolling;
             
             static int deviceIdx;
             static bool restartChannel;

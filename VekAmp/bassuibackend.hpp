@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
+#include <QtTypes>
 
 class BASSUIBackend : public QObject
 {
@@ -16,12 +17,18 @@ public:
 
     Q_INVOKABLE QString qGetTrackLenStr();
     Q_INVOKABLE qreal qGetTrackLen();
+    Q_INVOKABLE void qSetTrackProgress(qreal value);
+    Q_INVOKABLE void qSliderAdjustPause(bool state);
 
     Q_INVOKABLE void qSetVolume(qreal value);
     Q_INVOKABLE qreal qGetVolume();
 
+    Q_INVOKABLE QString qGetTrackName();
+
+    void EmitTrackChange();
+
 signals:
-    void fileChanged(const char *fPath[]);
+    void trackChanged();
 };
 
 #endif // BASSUIBACKEND_HPP
