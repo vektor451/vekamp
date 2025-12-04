@@ -35,3 +35,13 @@ qreal BASSUIBackend::qGetTrackLen()
     return trackProgress / trackLen;
 }
 
+void BASSUIBackend::qSetVolume(qreal value)
+{
+    BASS::BASSPlayer::SetVolume(value);
+}
+
+qreal BASSUIBackend::qGetVolume()
+{
+    return BASS::BASSPlayer::GetVolume();
+}
+

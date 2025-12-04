@@ -13,8 +13,12 @@ public:
     Q_INVOKABLE void qClickMe();
     Q_INVOKABLE void qFileSelect(QUrl fPath);
     Q_INVOKABLE void qPlayPause();
+
     Q_INVOKABLE QString qGetTrackLenStr();
     Q_INVOKABLE qreal qGetTrackLen();
+
+    Q_INVOKABLE void qSetVolume(qreal value);
+    Q_INVOKABLE qreal qGetVolume();
 
 signals:
     void fileChanged(const char *fPath[]);

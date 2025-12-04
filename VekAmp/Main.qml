@@ -158,9 +158,18 @@ Window {
                         Layout.leftMargin: 16
                         Layout.rightMargin: 16
                         Layout.fillWidth: true
-                        Label{
-                            text: qsTr("Welcome to VekAmp!")
-                            Layout.fillWidth: true
+                        RowLayout{
+                            Label{
+                                text: qsTr("Welcome to VekAmp!")
+                                Layout.fillWidth: true
+                            }
+
+                            Label{
+                                text: qsTr("00:00 / 00:00")
+                                horizontalAlignment: Text.AlignRight
+                                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                                Layout.fillWidth: true
+                            }
                         }
                         Slider{
                             id: progressSlider
@@ -170,18 +179,24 @@ Window {
                             to: 1
 
                             Timer{
-                                interval: 100; running: true; repeat: true
+                                interval: 10; running: true; repeat: true
                                 onTriggered: progressSlider.value = bassUI.qGetTrackLen();
                             }
                         }
                     }
 
                     Slider{
+                        id: volumeSlider
                         width: 128
                         Layout.maximumWidth: 128
                         Layout.minimumWidth: 64
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
+                        from: 0
+                        value: 0.4;
+                        to: 0.8
+
+                        onValueChanged: bassUI.qSetVolume(value)
                     }
                 }
             }

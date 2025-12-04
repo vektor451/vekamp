@@ -110,6 +110,8 @@ namespace BASS
         // Attempts initialisation on default device. 
         if(!BASS_Init(deviceIdx, 48000, 0, 0, NULL))
             BASSError("Couldn't init device. (Incorrect deviceIdx?)");
+
+        BASSPlayer::SetVolume(0.4);
     }
 
     void BASSPlayer::Destroy()
