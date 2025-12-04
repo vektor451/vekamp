@@ -1,10 +1,17 @@
+import QtCore
 import QtQuick
+import QtQuick.VectorImage
 import QtQuick.Controls
+import QtQuick.Controls.Fusion
+import QtQuick.Layouts
+import QtQuick.Dialogs
 import VekAmp
 
 Window {
     width: 960
     height: 600
+    minimumWidth: 640
+    minimumHeight: 360
     visible: true
     title: qsTr("VekAmp")
 
@@ -12,24 +19,178 @@ Window {
         id: bassUI
     }
 
+    FileDialog{
+        id: fileDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
+        title: qsTr("Open audio file...")
+        onAccepted: bassUI.qFileSelect(selectedFile)
+    }
+
+    Window{
+        id: aboutDialog
+        title: qsTr("About VekAmp")
+        maximumWidth: 384
+        maximumHeight: 240
+        minimumWidth: 384
+        minimumHeight: 200
+        flags: Qt.Dialog
+
+        Pane{
+            anchors.fill: parent
+            padding: 8
+
+            ColumnLayout{
+                anchors.fill: parent
+
+                VectorImage{
+                    source: "/images/Resources/wordmark.svg"
+                    assumeTrustedSource: true
+                    fillMode: VectorImage.Stretch
+                    width: 360
+                    height: 112
+                    preferredRendererType: VectorImage.CurveRenderer
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                }
+
+                Label{
+                    text: qsTr("VekAmp vX.X.X // Built:\nLicensed under GPLv3");
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Button{
+                    text: qsTr("Close")
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                    onClicked: aboutDialog.hide()
+                }
+            }
+        }
+    }
+
     Pane{
-        id: pane
         anchors.fill: parent
+        padding: 2
 
-        Label{
-            id: label
-            anchors.centerIn: parent
-            text: qsTr("Hello World!")
+        ColumnLayout{
+            anchors.fill: parent
 
-            Button{
-                text: qsTr("Click Me!")
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: -32
-                flat: false
-                anchors.horizontalCenter: parent.horizontalCenter
+            MenuBar{
+                height: 24
+                font.pointSize: 8
+                contentHeight: 24
 
-                onClicked: bassUI.qClickMe();
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                Menu{
+                    title: qsTr("&File")
+
+                    Action{
+                        text: qsTr("Open &File")
+                        onTriggered: fileDialog.open();
+                    }
+                }
+                Menu{
+                    title: qsTr("&Edit")
+
+                    Action{
+                        text: qsTr("&Preferences")
+
+                    }
+                }
+                Menu{
+                    title: qsTr("&About")
+
+                    Action{
+                        text: qsTr("&About VekAmp")
+                        onTriggered: aboutDialog.show()
+                    }
+
+                    Action{
+                        text: qsTr("Visit &GitHub Repository")
+                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
+                    }
+                }
+            }
+
+            ToolBar{
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.fillWidth: true
+                RowLayout{
+                    anchors.fill: parent
+                    spacing: 4
+                    Button{
+                        text: qsTr("<")
+                        Layout.bottomMargin: 4
+                        Layout.topMargin: 4
+                        Layout.margins: 0
+                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: 2
+                        Layout.minimumHeight: 32
+                        Layout.minimumWidth: 32
+                    }
+
+                    Button{
+                        text: qsTr("P")
+                        Layout.bottomMargin: 4
+                        Layout.topMargin: 4
+                        Layout.margins: 0
+                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: 2
+                        Layout.minimumHeight: 32
+                        Layout.minimumWidth: 32
+
+                        onClicked: bassUI.qPlayPause();
+                    }
+
+                    Button{
+                        text: qsTr(">")
+                        Layout.bottomMargin: 4
+                        Layout.topMargin: 4
+                        Layout.margins: 0
+                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: 2
+                        Layout.minimumHeight: 32
+                        Layout.minimumWidth: 32
+                    }
+
+                    ColumnLayout{
+                        Layout.margins: 4
+                        Layout.leftMargin: 16
+                        Layout.rightMargin: 16
+                        Layout.fillWidth: true
+                        Label{
+                            text: qsTr("Welcome to VekAmp!")
+                            Layout.fillWidth: true
+                        }
+                        Slider{
+                            id: progressSlider
+                            Layout.fillWidth: true
+                            from: 0
+                            value: 0
+                            to: 1
+
+                            Timer{
+                                interval: 100; running: true; repeat: true
+                                onTriggered: progressSlider.value = bassUI.qGetTrackLen();
+                            }
+                        }
+                    }
+
+                    Slider{
+                        width: 128
+                        Layout.maximumWidth: 128
+                        Layout.minimumWidth: 64
+                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
+                    }
+                }
             }
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0}D{i:3;invisible:true}
+}
+##^##*/

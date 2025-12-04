@@ -11,8 +11,13 @@ class BASSUIBackend : public QObject
 public:
     explicit BASSUIBackend(QObject *parent = nullptr);
     Q_INVOKABLE void qClickMe();
+    Q_INVOKABLE void qFileSelect(QUrl fPath);
+    Q_INVOKABLE void qPlayPause();
+    Q_INVOKABLE QString qGetTrackLenStr();
+    Q_INVOKABLE qreal qGetTrackLen();
 
 signals:
+    void fileChanged(const char *fPath[]);
 };
 
 #endif // BASSUIBACKEND_HPP

@@ -62,6 +62,8 @@ namespace BASS
             static QWORD GetTrackLen();
             static double GetTrackLenSecs();
             static const char *GetTrackLenStr();
+            static void SetCurFilePath(const char fPath[]);
+            static const char *GetCurFilePath();
             static bool IsPlaying();
         
         private:
@@ -69,6 +71,7 @@ namespace BASS
             static DWORD curChannel;
             static QWORD trackLen;
             static std::string trackLenStr;
+            static std::string curFilePath;
             static bool isPlaying;
             
             static int deviceIdx;

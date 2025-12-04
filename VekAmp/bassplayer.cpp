@@ -92,17 +92,18 @@ namespace BASS
     DWORD   	BASSPlayer::curChannel 		= -1;
     QWORD   	BASSPlayer::trackLen 		= -1;
     std::string BASSPlayer::trackLenStr 	= "0:00";
+    std::string BASSPlayer::curFilePath 	= "";
     bool    	BASSPlayer::restartChannel 	= FALSE;
     bool    	BASSPlayer::isPlaying 		= FALSE;
 
     void BASSPlayer::Init()
     {
         //Print out version.
-        qDebug("Using BASS Version %s\n", BASS::GetVersionStr().c_str());
+        qDebug("Using BASS Version %s", BASS::GetVersionStr().c_str());
         
         // Check the correct BASS version was loaded.
         if (HIWORD(BASS_GetVersion()) != BASSVERSION) {
-            qDebug("An incorrect version of BASS was loaded.\n");
+            qDebug("An incorrect version of BASS was loaded.");
             exit(0);
         }
 
@@ -128,48 +129,51 @@ namespace BASS
             BASSError("Couldn't free channel. (No channel set?)", false);
         
         AudioFormat::StreamFormat format = AudioFormat::GetFormat(fPath);
+
+        DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
         
         // These formats should be definite.
         if(format == AudioFormat::FLAC)
-            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         else if(format == AudioFormat::ALAC)
-            curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         else if(format == AudioFormat::APE)
-            curChannel = BASS_APE_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_APE_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         else if(format == AudioFormat::OPUS)
-            curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         // HACK: These are containers and might have multiple formats. We are going to brute force them.
         else if(format == AudioFormat::OGG) 
         {
             // Try as vorbis
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
             
             // If func returns false, then file is not valid vorbis. Try as OPUS.
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         }
         else if(format == AudioFormat::M4A)
         {
             // Try as generic.
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
 
             // If funcs return false, format is invalid. ALAC, FLAC, and OPUS are tried. 
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+                curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
 
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+                curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
             
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         }
         // Can be played by default in BASS, or just isn't a valid file.
         else
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN);
+            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         
         BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume);
 
-        qDebug("Playing back path: %s\n", fPath);
+        qDebug("Playing back path: %s", fPath);
+        SetCurFilePath(fPath);
 
         trackLen = BASS_ChannelGetLength(curChannel, BASS_POS_BYTE);
         if(trackLen != -1)
@@ -182,7 +186,7 @@ namespace BASS
             std::snprintf(lenStr, sizeof(lenStr), "%d:%02d", mins, secs);
 			trackLenStr = lenStr;
 
-            qDebug("Track length: %s (%f seconds)\n", trackLenStr.c_str(), totalSecs);
+            qDebug("Track length: %s (%f seconds)", trackLenStr.c_str(), totalSecs);
         } 
         else
         {
@@ -201,7 +205,7 @@ namespace BASS
         {
             if(BASS_ChannelPlay(curChannel, FALSE))
             {
-                qDebug("Playing Audio...\n");
+                qDebug("Playing Audio...");
                 restartChannel = FALSE;
             }
             else
@@ -214,7 +218,7 @@ namespace BASS
         {
             if(BASS_ChannelPause(curChannel))
             {
-                qDebug("Pausing Playback.\n");
+                qDebug("Pausing Playback.");
             }
             else
                 BASS::BASSError("Couldn't pause. (No channel set?)", FALSE);
@@ -227,7 +231,7 @@ namespace BASS
     {
         if(BASS_ChannelStop(curChannel))
         {
-            qDebug("Stopping Playback.\n");
+            qDebug("Stopping Playback.");
 			BASS_ChannelSetPosition(curChannel, 0, BASS_POS_BYTE);
 		}
         else
@@ -242,7 +246,7 @@ namespace BASS
 		{
 			if(BASS_ChannelPause(curChannel))
             {
-                qDebug("Pausing Playback.\n");
+                qDebug("Pausing Playback.");
             }
             else
                 BASS::BASSError("Couldn't pause. (No channel set?)", FALSE);
@@ -255,7 +259,7 @@ namespace BASS
 		{
 			if(BASS_ChannelPlay(curChannel, restartChannel))
             {
-                qDebug("Playing Audio...\n");
+                qDebug("Playing Audio...");
                 restartChannel = FALSE;
             }
             else
@@ -305,16 +309,22 @@ namespace BASS
     void BASSPlayer::SetVolume(float vol)
     {
         volume = vol;
-        qDebug("Set Volume to: %f\n", vol);
+        qDebug("Set Volume to: %f", vol);
 
         BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, vol);
+    }
+
+    void BASSPlayer::SetCurFilePath(const char fPath[])
+    {
+        curFilePath = fPath;
     }
 
 	// One liner Setters/Getters
     float       BASSPlayer::GetVolume() 		{return volume;}
 	QWORD       BASSPlayer::GetTrackLen() 		{return trackLen;}
 	double      BASSPlayer::GetTrackLenSecs()	{return BASS_ChannelBytes2Seconds(curChannel, trackLen);}
-	const char *BASSPlayer::GetTrackLenStr() 	{return trackLenStr.c_str();}
+    const char *BASSPlayer::GetTrackLenStr() 	{return trackLenStr.c_str();}
+    const char *BASSPlayer::GetCurFilePath() 	{return curFilePath.c_str();}
 	bool        BASSPlayer::IsPlaying()			{return isPlaying;}
 
 }

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(VekAmp VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Core)
@@ -19,8 +20,13 @@ qt_add_qml_module(appVekAmp
     URI VekAmp
     QML_FILES
         Main.qml
-        SOURCES bassuibackend.hpp bassuibackend.cpp
+    SOURCES
+        bassuibackend.hpp
+        bassuibackend.cpp
+    RESOURCES
+        resources.qrc
 )
+
 
 # BASS linkage
 set(BASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS)
