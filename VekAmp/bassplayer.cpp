@@ -70,7 +70,7 @@ namespace BASS
     
     AudioFormat::StreamFormat AudioFormat::GetFormat(std::string fPath)
     {
-        std::transform(fPath.begin(), fPath.end(), fPath.begin(), std::toupper);
+        std::transform(fPath.begin(), fPath.end(), fPath.begin(), [](const char &c){ return std::toupper(c); });
         for(int i = 0; i < StreamFormat::Count; i++)
         {
             size_t size = ExtNames[(StreamFormat)i].size();
@@ -133,16 +133,25 @@ namespace BASS
         AudioFormat::StreamFormat format = AudioFormat::GetFormat(fPath);
 
         DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
-        
+
+#if _WIN32
+        size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
+        std::wstring fNameBufStr;
+        fNameBufStr.resize(fNameLength);
+        MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBufStr.data(), fNameLength);
+        const WCHAR *fNameBuf = fNameBufStr.c_str();
+#else
+        const char *fNameBuf = fPath;
+#endif
         // These formats should be definite.
         if(format == AudioFormat::FLAC)
-            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::ALAC)
-            curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            curChannel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::APE)
-            curChannel = BASS_APE_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            curChannel = BASS_APE_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::OPUS)
-            curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         // HACK: These are containers and might have multiple formats. We are going to brute force them.
         else if(format == AudioFormat::OGG) 
         {
@@ -151,7 +160,7 @@ namespace BASS
             
             // If func returns false, then file is not valid vorbis. Try as OPUS.
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         }
         else if(format == AudioFormat::M4A)
         {
@@ -160,17 +169,17 @@ namespace BASS
 
             // If funcs return false, format is invalid. ALAC, FLAC, and OPUS are tried. 
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_ALAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+                curChannel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_FLAC_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+                curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
             
             if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         }
         // Can be played by default in BASS, or just isn't a valid file.
         else
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            curChannel = BASS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         
         BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume);
 
