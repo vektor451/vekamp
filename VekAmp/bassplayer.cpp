@@ -135,8 +135,11 @@ namespace BASS
         DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
 
 #if _WIN32
-        WCHAR fNameBuf[1024];
-        MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBuf, 1024);
+        size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
+        std::wstring fNameBufStr;
+        fNameBufStr.resize(fNameLength);
+        MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBufStr.data(), fNameLength);
+        const WCHAR *fNameBuf = fNameBufStr.c_str();
 #else
         const char *fNameBuf = fPath;
 #endif
