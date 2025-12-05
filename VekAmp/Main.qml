@@ -18,7 +18,7 @@ Window {
     BASSUIBackend{
         id: bassUI
         onTrackChanged: {
-            trackName.text = tagUI.qGetTrackName();
+            trackName.text = tagUI.qGetCurTrackName();
         }
     }
 
@@ -179,6 +179,9 @@ Window {
                                 id: trackName
                                 text: qsTr("Welcome to VekAmp!")
                                 Layout.fillWidth: true
+                                textFormat: Text.MarkdownText
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
                             }
 
                             Label{

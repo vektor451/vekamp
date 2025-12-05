@@ -10,21 +10,43 @@ TagUIBackend::TagUIBackend(QObject *parent)
     : QObject{parent}
 {}
 
-QString TagUIBackend::qGetTrackName()
+QString TagUIBackend::qGetCurTrackName()
 {
-    std::string curFilePath = BASS::BASSPlayer::GetCurFilePath();
+    const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-    TagLib::FileRef file(curFilePath.c_str());
+#if _WIN32
+    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
+    std::wstring fNameBufStr;
+    fNameBufStr.resize(fNameLength);
+    MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
+    const WCHAR *fNameBuf = fNameBufStr.c_str();
+#else
+    const char *fNameBuf = fPath;
+#endif
+
+    TagLib::FileRef file(fNameBuf);
     TagLib::String title = file.tag()->title();
+    TagLib::String artist = file.tag()->artist();
+
+    QString finalString = "";
+
+    if(!artist.isEmpty())
+    {
+        finalString += "**";
+        finalString += artist.toCWString();
+        finalString += "** - ";
+    }
 
     if (title.isEmpty())
     {
-        // Track name based on filename. This should be executed if there is no metadata to go off.
+        // Track name based on filename. This should be executed if there is no track metadata to go off.
         std::string fileString = std::filesystem::path(curFilePath).stem().string();
-        return QString::fromStdString(fileString);
+        finalString += fileString;
     }
     else
     {
-        return QString::fromWCharArray(title.toCWString());
+        finalString += title.toCWString();
     }
+
+    return finalString;
 }

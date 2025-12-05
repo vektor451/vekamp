@@ -10,7 +10,7 @@ class TagUIBackend : public QObject
     QML_ELEMENT
 public:
     explicit TagUIBackend(QObject *parent = nullptr);
-    Q_INVOKABLE QString qGetTrackName();
+    Q_INVOKABLE QString qGetCurTrackName();
 signals:
 };
 
