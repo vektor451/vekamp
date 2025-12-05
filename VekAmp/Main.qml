@@ -116,6 +116,11 @@ Window {
                         text: qsTr("Visit &GitHub Repository")
                         onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
                     }
+
+                    Action{
+                        text: qsTr("Report &Bug(s)")
+                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp/issues/new/choose")
+                    }
                 }
             }
 
