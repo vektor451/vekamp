@@ -22,6 +22,10 @@ Window {
         }
     }
 
+    MiscUIBackend{
+        id: miscUI
+    }
+
     FileDialog{
         id: fileDialog
         currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
@@ -56,7 +60,7 @@ Window {
                 }
 
                 Label{
-                    text: qsTr("VekAmp vX.X.X // Built:\nLicensed under GPLv3");
+                    text: miscUI.qGetAboutPromptString();
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                     horizontalAlignment: Text.AlignHCenter
                 }

@@ -12,11 +12,6 @@ BASSUIBackend::BASSUIBackend(QObject *parent)
     BASS::BASSPlayer::backendQObj = this;
 }
 
-void BASSUIBackend::qClickMe()
-{
-    qDebug("Hello World! Clicky Click!");
-}
-
 void BASSUIBackend::qFileSelect(QUrl fPath)
 {
     QString nativePath = fPath.toLocalFile().toUtf8();

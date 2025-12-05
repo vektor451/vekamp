@@ -11,7 +11,6 @@ class BASSUIBackend : public QObject
     QML_ELEMENT
 public:
     explicit BASSUIBackend(QObject *parent = nullptr);
-    Q_INVOKABLE void qClickMe();
     Q_INVOKABLE void qFileSelect(QUrl fPath);
     Q_INVOKABLE void qPlayPause();
 

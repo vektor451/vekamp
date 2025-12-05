@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(VekAmp VERSION 0.1 LANGUAGES CXX)
+project(VekAmp VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -23,10 +24,26 @@ qt_add_qml_module(appVekAmp
     SOURCES
         bassuibackend.hpp
         bassuibackend.cpp
+        miscuibackend.hpp
+        miscuibackend.cpp
     RESOURCES
         resources.qrc
 )
 
+string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)
+
+add_custom_target(
+    clear_cache
+    COMMAND ${CMAKE_COMMAND} -U BUILD_TIME ${CMAKE_BINARY_DIR}
+)
+
+add_dependencies(clear_cache)
+
+target_compile_definitions(appVekAmp PRIVATE
+    VEKAMP_NAME="${CMAKE_PROJECT_NAME}"
+    VEKAMP_VER="${CMAKE_PROJECT_VERSION}"
+    BUILD_TIME="${BUILD_TIME}"
+)
 
 # BASS linkage
 set(BASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS)
@@ -92,6 +109,7 @@ set_target_properties(appVekAmp PROPERTIES
 target_link_libraries(appVekAmp
     PRIVATE Qt6::Quick
 )
+target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)
