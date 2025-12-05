@@ -18,10 +18,14 @@ find_package(TagLib 2.1.1 REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Resources/appicon.rc")
+
 qt_add_executable(appVekAmp
     main.cpp
     bassplayer.cpp
     utils.cpp
+
+    ${app_icon_resource_windows}
 )
 
 qt_add_qml_module(appVekAmp
@@ -36,6 +40,7 @@ qt_add_qml_module(appVekAmp
     RESOURCES
         resources.qrc
         SOURCES taguibackend.h taguibackend.cpp
+        RESOURCES Resources/appicon.rc
 )
 
 string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)

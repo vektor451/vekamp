@@ -7,13 +7,53 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import VekAmp
 
-Window {
+ApplicationWindow {
     width: 960
     height: 600
     minimumWidth: 640
     minimumHeight: 360
     visible: true
     title: qsTr("VekAmp")
+
+    palette.highlight: "#cc3366"
+
+    menuBar: MenuBar{
+        font.pointSize: 8
+        Menu{
+            title: qsTr("&File")
+
+            Action{
+                text: qsTr("Open &File")
+                onTriggered: fileDialog.open();
+            }
+        }
+        Menu{
+            title: qsTr("&Edit")
+
+            Action{
+                text: qsTr("&Preferences")
+
+            }
+        }
+        Menu{
+            title: qsTr("&About")
+
+            Action{
+                text: qsTr("&About VekAmp")
+                onTriggered: aboutDialog.show()
+            }
+
+            Action{
+                text: qsTr("Visit &GitHub Repository")
+                onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
+            }
+
+            Action{
+                text: qsTr("Report &Bug(s)")
+                onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp/issues/new/choose")
+            }
+        }
+    }
 
     BASSUIBackend{
         id: bassUI
@@ -38,6 +78,7 @@ Window {
     }
 
     Window{
+        //TODO: get this an icon
         id: aboutDialog
         title: qsTr("About VekAmp")
         maximumWidth: 384
@@ -45,6 +86,7 @@ Window {
         minimumWidth: 384
         minimumHeight: 200
         flags: Qt.Dialog
+
 
         Pane{
             anchors.fill: parent
@@ -84,46 +126,85 @@ Window {
 
         ColumnLayout{
             anchors.fill: parent
+            spacing: 2
 
-            MenuBar{
-                height: 24
-                font.pointSize: 8
-                contentHeight: 24
 
+
+            Frame {
+                id: frame
+                width: 200
+                height: 200
+                bottomPadding: 0
+                padding: 0
+                leftPadding: 0
+                topPadding: 0
+                contentWidth: 5
+                Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-                Menu{
-                    title: qsTr("&File")
 
-                    Action{
-                        text: qsTr("Open &File")
-                        onTriggered: fileDialog.open();
-                    }
-                }
-                Menu{
-                    title: qsTr("&Edit")
+                RowLayout{
+                    anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
 
-                    Action{
-                        text: qsTr("&Preferences")
 
-                    }
-                }
-                Menu{
-                    title: qsTr("&About")
 
-                    Action{
-                        text: qsTr("&About VekAmp")
-                        onTriggered: aboutDialog.show()
-                    }
+                    Frame {
+                        id: frame1
+                        width: 192
+                        height: 200
+                        verticalPadding: 2
+                        topPadding: 2
+                        rightPadding: 2
+                        padding: 2
+                        leftPadding: 2
+                        Layout.preferredWidth: 192
+                        Layout.fillHeight: true
 
-                    Action{
-                        text: qsTr("Visit &GitHub Repository")
-                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
+                        ScrollView {
+                            id: scrollView
+                            anchors.fill: parent
+                            Layout.preferredWidth: 192
+                            Layout.fillHeight: true
+                        }
                     }
 
-                    Action{
-                        text: qsTr("Report &Bug(s)")
-                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp/issues/new/choose")
+                    Frame {
+                        id: frame2
+                        width: 200
+                        height: 200
+                        padding: 2
+                        bottomPadding: 2
+                        horizontalPadding: 2
+                        Layout.preferredWidth: 192
+                        Layout.fillHeight: true
+                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
+                        ColumnLayout {
+                            id: columnLayout
+                            anchors.fill: parent
+                            Layout.preferredHeight: 65535
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: 192
+                            Layout.alignment: Qt.AlignRight | Qt.AlignTop
+                            spacing: 4
+                            layoutDirection: Qt.LeftToRight
+                            Layout.fillWidth: false
+
+                            Image {
+                                id: image
+                                width: 100
+                                height: 100
+                                source: "Resources/wordmark.svg"
+                                Layout.fillHeight: false
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                                mipmap: true
+                                sourceSize.height: 192
+                                sourceSize.width: 192
+                                fillMode: Image.PreserveAspectFit
+                            }
+                        }
                     }
                 }
             }
@@ -264,12 +345,15 @@ Window {
                     }
                 }
             }
+
+
+
         }
     }
 }
 
 /*##^##
 Designer {
-    D{i:0}D{i:3;invisible:true}
+    D{i:0}D{i:3;invisible:true}D{i:25}D{i:27}
 }
 ##^##*/

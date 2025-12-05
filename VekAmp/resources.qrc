@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/images">
         <file>Resources/wordmark.svg</file>
+        <file>Resources/appicon.ico</file>
     </qresource>
 </RCC>
