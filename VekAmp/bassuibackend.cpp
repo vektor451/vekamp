@@ -64,11 +64,6 @@ qreal BASSUIBackend::qGetVolume()
     return BASS::BASSPlayer::GetVolume();
 }
 
-QString BASSUIBackend::qGetTrackName()
-{
-    return QString::fromStdString(BASS::BASSPlayer::GetTrackName());
-}
-
 void BASSUIBackend::EmitTrackChange()
 {
     emit trackChanged();

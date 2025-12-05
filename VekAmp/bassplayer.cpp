@@ -347,12 +347,6 @@ namespace BASS
         curFilePath = fPath;
     }
 
-    std::string BASSPlayer::GetTrackName()
-    {
-        // Track name based on filename. This should be executed if there is no metadata to go off.
-        return std::filesystem::path(curFilePath).stem().string();
-    }
-
 	// One liner Setters/Getters
     float       BASSPlayer::GetVolume() 		{return volume;}
 	QWORD       BASSPlayer::GetTrackLen() 		{return trackLen;}

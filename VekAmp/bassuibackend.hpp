@@ -22,8 +22,6 @@ public:
     Q_INVOKABLE void qSetVolume(qreal value);
     Q_INVOKABLE qreal qGetVolume();
 
-    Q_INVOKABLE QString qGetTrackName();
-
     void EmitTrackChange();
 
 signals:

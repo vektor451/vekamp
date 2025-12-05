@@ -2,12 +2,19 @@ cmake_minimum_required(VERSION 3.16)
 
 project(VekAmp VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
+set(TAGLIB_PATH C:/taglib)
+set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
+
+set(CMAKE_PREFIX_PATH C:/taglib)
+find_package(TagLib 2.1.1 REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -28,6 +35,7 @@ qt_add_qml_module(appVekAmp
         miscuibackend.cpp
     RESOURCES
         resources.qrc
+        SOURCES taguibackend.h taguibackend.cpp
 )
 
 string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)
@@ -45,12 +53,12 @@ target_compile_definitions(appVekAmp PRIVATE
     BUILD_TIME="${BUILD_TIME}"
 )
 
-# BASS linkage
 set(BASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS)
 set(BASS_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS/Lib)
 
 target_include_directories(appVekAmp PUBLIC
     ${BASS_DIR}
+    ${TAGLIB_INCLUDE_PATH}
 )
 
 add_library(BASS SHARED IMPORTED)
@@ -93,6 +101,7 @@ set(BASS_TARGETS
 
 target_link_libraries(appVekAmp PUBLIC
     ${BASS_TARGETS}
+    TagLib::tag
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -109,7 +118,6 @@ set_target_properties(appVekAmp PROPERTIES
 target_link_libraries(appVekAmp
     PRIVATE Qt6::Quick
 )
-target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)

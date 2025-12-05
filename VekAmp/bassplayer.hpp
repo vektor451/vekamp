@@ -56,7 +56,6 @@ namespace BASS
             static void SetPos(double pos);
             static double GetTrackProgressSecs();
             static std::string GetTrackProgressStr(double pos);
-            static std::string GetTrackName();
 
             // Getters & setters.
             static void SetVolume(float vol);

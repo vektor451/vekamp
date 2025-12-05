@@ -18,12 +18,16 @@ Window {
     BASSUIBackend{
         id: bassUI
         onTrackChanged: {
-            trackName.text = qGetTrackName();
+            trackName.text = tagUI.qGetTrackName();
         }
     }
 
     MiscUIBackend{
         id: miscUI
+    }
+
+    TagUIBackend{
+        id: tagUI
     }
 
     FileDialog{
