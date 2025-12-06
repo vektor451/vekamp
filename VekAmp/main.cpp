@@ -4,6 +4,9 @@
 #include <QQmlApplicationEngine>
 #include <QQuickItem>
 #include <QCommandLineParser>
+#include <QPalette>
+#include <QQuickImageProvider>
+#include <coverimageprovider.hpp>
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +30,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
+    engine.addImageProvider("coverImage", new CoverImageProvider);
     engine.loadFromModule("VekAmp", "Main");
 
     // Bass Init

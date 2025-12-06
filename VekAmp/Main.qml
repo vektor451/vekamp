@@ -7,7 +7,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import VekAmp
 
-ApplicationWindow {
+Window {
     width: 960
     height: 600
     minimumWidth: 640
@@ -15,7 +15,7 @@ ApplicationWindow {
     visible: true
     title: qsTr("VekAmp")
 
-    palette.highlight: "#cc3366"
+    //palette.highlight: "#cc3366" palette only works with ApplicationWindow, which none of the editors support as a root element.
 
     DropArea{
         id: fileDrop
@@ -25,44 +25,6 @@ ApplicationWindow {
         }
         onDropped: {
             bassUI.qFileSelect(drop.urls[0])
-        }
-    }
-
-    menuBar: MenuBar{
-        font.pointSize: 8
-        Menu{
-            title: qsTr("&File")
-
-            Action{
-                text: qsTr("Open &File")
-                onTriggered: fileDialog.open();
-            }
-        }
-        Menu{
-            title: qsTr("&Edit")
-
-            Action{
-                text: qsTr("&Preferences")
-
-            }
-        }
-        Menu{
-            title: qsTr("&About")
-
-            Action{
-                text: qsTr("&About VekAmp")
-                onTriggered: aboutDialog.show()
-            }
-
-            Action{
-                text: qsTr("Visit &GitHub Repository")
-                onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
-            }
-
-            Action{
-                text: qsTr("Report &Bug(s)")
-                onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp/issues/new/choose")
-            }
         }
     }
 
@@ -145,7 +107,7 @@ ApplicationWindow {
                 anchors.fill: parent
 
                 VectorImage{
-                    source: "/images/Resources/wordmark.svg"
+                    source: "/Resources/wordmark.svg"
                     assumeTrustedSource: true
                     fillMode: VectorImage.Stretch
                     width: 360
@@ -177,7 +139,44 @@ ApplicationWindow {
             anchors.fill: parent
             spacing: 2
 
+            MenuBar{
+                Layout.fillWidth: true
+                font.pointSize: 8
+                Menu{
+                    title: qsTr("&File")
 
+                    Action{
+                        text: qsTr("Open &File")
+                        onTriggered: fileDialog.open();
+                    }
+                }
+                Menu{
+                    title: qsTr("&Edit")
+
+                    Action{
+                        text: qsTr("&Preferences")
+
+                    }
+                }
+                Menu{
+                    title: qsTr("&About")
+
+                    Action{
+                        text: qsTr("&About VekAmp")
+                        onTriggered: aboutDialog.show()
+                    }
+
+                    Action{
+                        text: qsTr("Visit &GitHub Repository")
+                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp")
+                    }
+
+                    Action{
+                        text: qsTr("Report &Bug(s)")
+                        onTriggered: Qt.openUrlExternally("https://github.com/vektor451/vekamp/issues/new/choose")
+                    }
+                }
+            }
 
             Frame {
                 id: frame
@@ -225,7 +224,7 @@ ApplicationWindow {
                         padding: 2
                         bottomPadding: 2
                         horizontalPadding: 2
-                        Layout.preferredWidth: 192
+                        Layout.preferredWidth: 260
                         Layout.fillHeight: true
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
@@ -234,7 +233,8 @@ ApplicationWindow {
                             anchors.fill: parent
                             Layout.preferredHeight: 65535
                             Layout.fillHeight: true
-                            Layout.preferredWidth: 192
+                            width: 256
+                            Layout.preferredWidth: 256
                             Layout.alignment: Qt.AlignRight | Qt.AlignTop
                             spacing: 4
                             layoutDirection: Qt.LeftToRight
@@ -242,15 +242,16 @@ ApplicationWindow {
 
                             Image {
                                 id: image
-                                width: 100
-                                height: 100
-                                source: "Resources/wordmark.svg"
+                                verticalAlignment: Image.AlignVCenter
+                                source: "image://coverImage"
                                 Layout.fillHeight: false
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                                 mipmap: true
-                                sourceSize.height: 192
-                                sourceSize.width: 192
+                                sourceSize.height: 256
+                                sourceSize.width: 256
+                                height: 256
+                                width: 256
                                 fillMode: Image.PreserveAspectFit
                             }
                         }
@@ -400,6 +401,6 @@ ApplicationWindow {
 
 /*##^##
 Designer {
-    D{i:0}D{i:3;invisible:true}D{i:25}D{i:27}
+    D{i:0}D{i:3;invisible:true}
 }
 ##^##*/

@@ -37,10 +37,13 @@ qt_add_qml_module(appVekAmp
         bassuibackend.cpp
         miscuibackend.hpp
         miscuibackend.cpp
+        coverimageprovider.hpp
+        coverimageprovider.cpp
+        taguibackend.h
+        taguibackend.cpp
     RESOURCES
         resources.qrc
-        SOURCES taguibackend.h taguibackend.cpp
-        RESOURCES Resources/appicon.rc
+        Resources/appicon.rc
 )
 
 string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)
