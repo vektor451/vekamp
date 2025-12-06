@@ -356,9 +356,6 @@ ApplicationWindow {
                     }
                 }
             }
-
-
-
         }
     }
 }
