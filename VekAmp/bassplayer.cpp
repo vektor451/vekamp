@@ -41,14 +41,73 @@ namespace BASS
         return verString;
     }
 
-    void BASSError(const char *text, bool isFatal)
+    std::string GetErrorStr(int err)
     {
-        qDebug("BASS Error(%d): %s\n", BASS_ErrorGetCode(), text);
-        
+        std::map<int, std::string> BASSErrorCodeStr{
+            {BASS_OK,                   "BASS_OK"},
+            {BASS_ERROR_MEM,            "BASS_ERROR_MEM"},
+            {BASS_ERROR_FILEOPEN,       "BASS_ERROR_FILEOPEN"},
+            {BASS_ERROR_DRIVER,         "BASS_ERROR_DRIVER"},
+            {BASS_ERROR_BUFLOST,        "BASS_ERROR_BUFLOST"},
+            {BASS_ERROR_HANDLE,         "BASS_ERROR_HANDLE"},
+            {BASS_ERROR_FORMAT,         "BASS_ERROR_FORMAT"},
+            {BASS_ERROR_POSITION,       "BASS_ERROR_POSITION"},
+            {BASS_ERROR_INIT,           "BASS_ERROR_INIT"},
+            {BASS_ERROR_START,          "BASS_ERROR_START"},
+            {BASS_ERROR_SSL,            "BASS_ERROR_SSL"},
+            {BASS_ERROR_REINIT,         "BASS_ERROR_REINIT"},
+            {BASS_ERROR_ALREADY,        "BASS_ERROR_ALREADY"},
+            {BASS_ERROR_NOTAUDIO,       "BASS_ERROR_NOTAUDIO"},
+            {BASS_ERROR_NOCHAN,         "BASS_ERROR_NOCHAN"},
+            {BASS_ERROR_ILLTYPE,        "BASS_ERROR_ILLTYPE"},
+            {BASS_ERROR_ILLPARAM,       "BASS_ERROR_ILLPARAM"},
+            {BASS_ERROR_NO3D,           "BASS_ERROR_NO3D"},
+            {BASS_ERROR_NOEAX,          "BASS_ERROR_NOEAX"},
+            {BASS_ERROR_DEVICE,         "BASS_ERROR_DEVICE"},
+            {BASS_ERROR_NOPLAY,         "BASS_ERROR_NOPLAY"},
+            {BASS_ERROR_FREQ,           "BASS_ERROR_FREQ"},
+            {BASS_ERROR_NOTFILE,        "BASS_ERROR_NOTFILE"},
+            {BASS_ERROR_NOHW,           "BASS_ERROR_NOHW"},
+            {BASS_ERROR_EMPTY,          "BASS_ERROR_EMPTY"},
+            {BASS_ERROR_NONET,          "BASS_ERROR_NONET"},
+            {BASS_ERROR_CREATE,         "BASS_ERROR_CREATE"},
+            {BASS_ERROR_NOFX,           "BASS_ERROR_NOFX"},
+            {BASS_ERROR_NOTAVAIL,       "BASS_ERROR_NOTAVAIL"},
+            {BASS_ERROR_DECODE,         "BASS_ERROR_DECODE"},
+            {BASS_ERROR_DX,             "BASS_ERROR_DX"},
+            {BASS_ERROR_TIMEOUT,        "BASS_ERROR_TIMEOUT"},
+            {BASS_ERROR_FILEFORM,       "BASS_ERROR_FILEFORM"},
+            {BASS_ERROR_SPEAKER,        "BASS_ERROR_SPEAKER"},
+            {BASS_ERROR_VERSION,        "BASS_ERROR_VERSION"},
+            {BASS_ERROR_CODEC,          "BASS_ERROR_CODEC"},
+            {BASS_ERROR_ENDED,          "BASS_ERROR_ENDED"},
+            {BASS_ERROR_BUSY,           "BASS_ERROR_BUSY"},
+            {BASS_ERROR_UNSTREAMABLE,   "BASS_ERROR_UNSTREAMABLE"},
+            {BASS_ERROR_PROTOCOL,       "BASS_ERROR_PROTOCOL"},
+            {BASS_ERROR_DENIED,         "BASS_ERROR_DENIED"},
+            {BASS_ERROR_UNKNOWN,        "BASS_ERROR_UNKNOWN"},
+        };
+
+        return BASSErrorCodeStr[err];
+    }
+
+    void BASSError(const char *text, bool isFatal, bool showGUI)
+    {
+        qDebug("BASS Error: %s (%s)", GetErrorStr(BASS_ErrorGetCode()).c_str(), text);
+
         if(isFatal)
         {
             BASS_Free();
             exit(0);
+        }
+
+        if(showGUI && BASS::BASSPlayer::backendQObj)
+        {
+            QString str = "**A BASS Error has occured:** ";
+            str += GetErrorStr(BASS_ErrorGetCode());
+            str += "\n\n";
+            str += text;
+            BASS::BASSPlayer::backendQObj->EmitErrorMessage(str);
         }
     }
 
@@ -126,7 +185,7 @@ namespace BASS
             qDebug("Bass Freed\n");
     }
 
-    void BASSPlayer::StartFilePlayback(const char fPath[])
+    bool BASSPlayer::StartFilePlayback(const char fPath[])
     {
         if(!BASS_ChannelStop(curChannel))
             BASSError("Couldn't stop channel. (No channel set?)", false);
@@ -184,6 +243,19 @@ namespace BASS
         // Can be played by default in BASS, or just isn't a valid file.
         else
             curChannel = BASS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+
+        if(BASS_ErrorGetCode() != BASS_OK)
+        {
+            BASSError("File is invalid!", false, true);
+
+            // possible recursion? if curFilePath is set to something invalid to begin with.
+            if(curFilePath != "")
+            {
+                StartFilePlayback(GetCurFilePath());
+            }
+
+            return false;
+        }
         
         BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume);
 
@@ -219,6 +291,7 @@ namespace BASS
 		}
 
 		isPlaying = false;
+        return true;
     }
 
     void BASSPlayer::StartPausePlayback()

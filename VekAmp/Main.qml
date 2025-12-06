@@ -71,6 +71,45 @@ ApplicationWindow {
         onTrackChanged: {
             trackName.text = tagUI.qGetCurTrackName();
         }
+        onBassError: {
+            bassERROR.show();
+            bassERRORText.text = message;
+        }
+    }
+
+    Window{
+        id: bassERROR
+        title: qsTr("BASS Error")
+        maximumWidth: 256
+        maximumHeight: 128
+        minimumWidth: 256
+        minimumHeight: 128
+        flags: Qt.Dialog
+
+        Pane{
+            anchors.fill: parent;
+
+            ColumnLayout{
+                anchors.fill: parent;
+
+                Label{
+                    id: bassERRORText
+                    text: "";
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    textFormat: Text.MarkdownText
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+
+                Button{
+                    text: qsTr("OK")
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+                    onClicked: bassERROR.hide()
+                }
+            }
+        }
+
     }
 
     MiscUIBackend{
@@ -93,11 +132,10 @@ ApplicationWindow {
         id: aboutDialog
         title: qsTr("About VekAmp")
         maximumWidth: 384
-        maximumHeight: 240
+        maximumHeight: 200
         minimumWidth: 384
         minimumHeight: 200
         flags: Qt.Dialog
-
 
         Pane{
             anchors.fill: parent

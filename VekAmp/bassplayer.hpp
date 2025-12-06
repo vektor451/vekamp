@@ -14,7 +14,8 @@
 namespace BASS 
 {
     std::string GetVersionStr();
-    void BASSError(const char *text, bool isFatal = true);
+    void BASSError(const char *text, bool isFatal = false, bool showGUI = false);
+    std::string GetErrorStr(int err);
 
     class AudioFormat {
         public:
@@ -48,7 +49,7 @@ namespace BASS
             // Functions
             static void Init();
             static void Destroy();
-            static void StartFilePlayback(const char fPath[]);
+            static bool StartFilePlayback(const char fPath[]);
             static void StartPausePlayback();
             static void StopPlayback();
             static void StartScroll();

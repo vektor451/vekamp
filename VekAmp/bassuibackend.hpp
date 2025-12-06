@@ -23,9 +23,11 @@ public:
     Q_INVOKABLE qreal qGetVolume();
 
     void EmitTrackChange();
+    void EmitErrorMessage(QString message);
 
 signals:
     void trackChanged();
+    void bassError(QString message);
 };
 
 #endif // BASSUIBACKEND_HPP

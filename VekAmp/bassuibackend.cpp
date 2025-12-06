@@ -16,8 +16,11 @@ void BASSUIBackend::qFileSelect(QUrl fPath)
 {
     QString nativePath = fPath.toLocalFile().toUtf8();
     qDebug() << "File Selected: " << nativePath;
-    BASS::BASSPlayer::StartFilePlayback(nativePath.toStdString().c_str());
-    BASS::BASSPlayer::StartPausePlayback();
+
+    if (BASS::BASSPlayer::StartFilePlayback(nativePath.toStdString().c_str()))
+    {
+        BASS::BASSPlayer::StartPausePlayback();
+    }
 }
 
 void BASSUIBackend::qPlayPause()
@@ -67,5 +70,10 @@ qreal BASSUIBackend::qGetVolume()
 void BASSUIBackend::EmitTrackChange()
 {
     emit trackChanged();
+}
+
+void BASSUIBackend::EmitErrorMessage(QString message)
+{
+    emit bassError(message);
 }
 
