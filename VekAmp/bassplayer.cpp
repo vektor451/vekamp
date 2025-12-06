@@ -221,26 +221,26 @@ namespace BASS
             // Try as vorbis
             curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
             
-            // If func returns false, then file is not valid vorbis. Try as OPUS.
-            if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
+            // If file format invalid, try as OPUS.
+            if(BASS_ErrorGetCode() != BASS_OK)
                 curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         }
         else if(format == AudioFormat::M4A)
         {
-            // Try as generic.
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+            // Generic BASS has FLAC support but it's unstable. Try flac before generic.
+            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
-            // If funcs return false, format is invalid. ALAC, FLAC, and OPUS are tried. 
-            if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
+            // If not FLAC, try ALAC, OPUS, and Generic
+            if(BASS_ErrorGetCode() != BASS_OK)
                 curChannel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
-            if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
-                curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
-            
-            if(!BASS_ChannelSetAttribute(curChannel, BASS_ATTRIB_VOL, volume))
+            if(BASS_ErrorGetCode() != BASS_OK)
                 curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+
+            if(BASS_ErrorGetCode() != BASS_OK)
+                curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         }
-        // Can be played by default in BASS, or just isn't a valid file.
+        // Can be played by default in BASS, or else it just isn't a valid file.
         else
             curChannel = BASS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
