@@ -12,11 +12,12 @@ The main motivation for this project is to replace my currently used music playe
 
 ## Current Plans
 The plans for the current stage of development are as follows: 
-- [ ] Basic media playback functionalities. (Play/Pause, Duration/Position, Volume)
+- [x] Basic media playback functionalities. (Play/Pause, Duration/Position, Volume)
 - [ ] Track Queue.
 - [ ] More playback functionalities. (Previous, Next, Loop Mode)
 - [ ] Read playlists.
-- [ ] Read metadata.
+- [x] Read metadata.
+- [x] Extract album art and display it.
 
 ## Platforms
 This branch has only been tested on windows.
