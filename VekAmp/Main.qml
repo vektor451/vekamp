@@ -17,6 +17,17 @@ ApplicationWindow {
 
     palette.highlight: "#cc3366"
 
+    DropArea{
+        id: fileDrop
+        anchors.fill: parent
+        onEntered: {
+            drag.accept(Qt.LinkAction)
+        }
+        onDropped: {
+            bassUI.qFileSelect(drop.urls[0])
+        }
+    }
+
     menuBar: MenuBar{
         font.pointSize: 8
         Menu{
