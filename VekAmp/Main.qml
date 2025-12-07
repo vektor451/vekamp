@@ -32,6 +32,7 @@ Window {
         id: bassUI
         onTrackChanged: {
             trackName.text = tagUI.qGetCurTrackName();
+            tagUI.qUpdateAlbumCover();
         }
         onBassError: {
             bassERROR.show();
@@ -80,6 +81,13 @@ Window {
 
     TagUIBackend{
         id: tagUI
+        onUpdateImage: {
+            console.log("triggered image update")
+            coverImage.source = "/Resources/emptycover.png"
+            coverImage.update()
+            coverImage.source = "image://coverImage"
+            coverImage.update()
+        }
     }
 
     FileDialog{
@@ -222,9 +230,10 @@ Window {
                         width: 200
                         height: 200
                         padding: 2
-                        bottomPadding: 2
+                        verticalPadding: 2
+                        bottomPadding: 3
                         horizontalPadding: 2
-                        Layout.preferredWidth: 260
+                        Layout.preferredWidth: 262
                         Layout.fillHeight: true
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
@@ -241,7 +250,7 @@ Window {
                             Layout.fillWidth: false
 
                             Image {
-                                id: image
+                                id: coverImage
                                 verticalAlignment: Image.AlignVCenter
                                 source: "image://coverImage"
                                 Layout.fillHeight: false
@@ -253,6 +262,7 @@ Window {
                                 height: 256
                                 width: 256
                                 fillMode: Image.PreserveAspectFit
+                                cache: false;
                             }
                         }
                     }

@@ -11,7 +11,10 @@ class TagUIBackend : public QObject
 public:
     explicit TagUIBackend(QObject *parent = nullptr);
     Q_INVOKABLE QString qGetCurTrackName();
+    Q_INVOKABLE void qUpdateAlbumCover();
+
 signals:
+    void updateImage();
 };
 
 #endif // TAGUIBACKEND_H
