@@ -57,7 +57,7 @@ std::wstring GetCoverFilePath(const char fPath[])
     }
 
     // No file found.
-    return std::wstring();
+    return L"";
 }
 
 

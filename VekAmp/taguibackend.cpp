@@ -2,7 +2,11 @@
 #include "tag.h"
 #include "fileref.h"
 #include "flacpicture.h"
+#include "flacfile.h"
+#include "mpegfile.h"
 #include "id3v2.h"
+#include "attachedpictureframe.h"
+#include "id3v2tag.h"
 #include "bassplayer.hpp"
 #include "coverimageprovider.hpp"
 #include "utils.hpp"
@@ -75,12 +79,32 @@ void TagUIBackend::qUpdateAlbumCover()
     TagLib::FileRef file(fNameBuf);
 
     std::wstring coverfPath = GetCoverFilePath(curFilePath);
+    QString qcoverfPath = QString::fromStdWString(coverfPath);
 
     // Generic tag is good enough to see if we want a picture.
-    if(file.complexPropertyKeys().contains("PICTURE") && !coverfPath.empty())
+    if(file.complexPropertyKeys().contains("PICTURE") && qcoverfPath.isEmpty())
     {
         // Embedded cover fetching requires use of the specific tag objects.
-
+        // MP3
+        if(auto mpegFile = dynamic_cast<TagLib::MPEG::File *>(file.file()))
+        {
+            if(auto id3v2Tag = mpegFile->ID3v2Tag())
+            {
+                const TagLib::ID3v2::FrameList coverFrames = id3v2Tag->frameListMap()["APIC"];
+                TagLib::ID3v2::AttachedPictureFrame *cover = static_cast<TagLib::ID3v2::AttachedPictureFrame*>(coverFrames.front());
+                CoverImageProvider::imgData = QByteArray(reinterpret_cast<const char*>(cover->picture().data()), cover->picture().size());
+            }
+        }
+        // FLAC
+        else if (auto flacFile = dynamic_cast<TagLib::FLAC::File *>(file.file()))
+        {
+            auto flacPictures = flacFile->pictureList();
+            if(!flacPictures.isEmpty())
+            {
+                auto picData = flacPictures[0]->data();
+                CoverImageProvider::imgData = QByteArray(reinterpret_cast<const char*>(picData.data()), picData.size());
+            }
+        }
     }
     else
     {
@@ -88,7 +112,8 @@ void TagUIBackend::qUpdateAlbumCover()
     }
 
     // Will attempt to get filepath of cover. If not found, it will return "".
-    CoverImageProvider::coverFilePath = QString::fromStdWString(coverfPath);
+    CoverImageProvider::coverFilePath = qcoverfPath;
+
     emit updateImage();
 }
 

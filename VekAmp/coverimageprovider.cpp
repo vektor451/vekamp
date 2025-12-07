@@ -21,16 +21,19 @@ QPixmap CoverImageProvider::requestPixmap(const QString &id, QSize *size, const 
 
     if(!coverFilePath.isEmpty())
     {
+        qDebug() << "Loading from sibling file.";
         pixmap.load(coverFilePath);
     }
     else if(imgData.isEmpty())
     {
+        qDebug() << "No cover data to load.";
         pixmap.load("://Resources/emptycover.png");
     }
     else
     {
+        qDebug() << "Loading from embedded data.";
         pixmap.loadFromData(imgData);
     }
 
-    return pixmap.scaledToWidth(requestedSize.width(), Qt::TransformationMode::SmoothTransformation);
+    return pixmap.scaledToHeight(requestedSize.height(), Qt::TransformationMode::SmoothTransformation);
 }
