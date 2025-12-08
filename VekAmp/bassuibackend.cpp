@@ -42,12 +42,18 @@ void BASSUIBackend::qPlayPause()
 void BASSUIBackend::qNextTrack()
 {
     BASS::BASSPlayer::GoNextTrack();
-    BASS::BASSPlayer::StartPausePlayback();
 }
 
 void BASSUIBackend::qPrevHomeTrack()
 {
-
+    if(BASS::BASSPlayer::GetTrackProgressSecs() < 1.0)
+    {
+        BASS::BASSPlayer::GoPrevTrack();
+    }
+    else
+    {
+        BASS::BASSPlayer::SetPos(0);
+    }
 }
 
 QString BASSUIBackend::qGetTrackLenStr()

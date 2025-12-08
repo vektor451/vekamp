@@ -73,6 +73,7 @@ namespace BASS
             static bool IsScrolling();
             static int GetTrackQueueIdx();
             static int GetNextTrackQueueIdx();
+            static int GetPrevTrackQueueIdx();
             static void InitTrackQueue(std::vector<std::string> newQueue);
             static void GoNextTrack();
             static void GoPrevTrack();

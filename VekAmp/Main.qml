@@ -220,8 +220,6 @@ Window {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
-
-
                     Frame {
                         id: frame1
                         width: 192
@@ -301,6 +299,8 @@ Window {
                         Layout.preferredWidth: 2
                         Layout.minimumHeight: 32
                         Layout.minimumWidth: 32
+
+                        onClicked: bassUI.qPrevHomeTrack();
                     }
 
                     Button{

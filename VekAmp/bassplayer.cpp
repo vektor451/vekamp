@@ -482,8 +482,33 @@ namespace BASS
 
     void BASSPlayer::GoNextTrack()
     {
-        trackQueueIdx = GetNextTrackQueueIdx();
-        StartFilePlayback(trackQueue[trackQueueIdx].c_str(), true);
+        if(trackQueue.size() > 1)
+        {
+            trackQueueIdx = GetNextTrackQueueIdx();
+            StartFilePlayback(trackQueue[trackQueueIdx].c_str(), true);
+            StartPausePlayback();
+        }
+        else if(trackQueue.size() == 1)
+        {
+            SetPos(0);
+        }
+
+        qDebug() << "Current track queue idx" << trackQueueIdx;
+    }
+
+    void BASSPlayer::GoPrevTrack()
+    {
+        if(trackQueue.size() > 1)
+        {
+            trackQueueIdx = GetPrevTrackQueueIdx();
+            StartFilePlayback(trackQueue[trackQueueIdx].c_str(), false);
+            StartPausePlayback();
+        }
+        else if(trackQueue.size() == 1)
+        {
+            SetPos(0);
+        }
+
         qDebug() << "Current track queue idx" << trackQueueIdx;
     }
 
@@ -506,7 +531,6 @@ namespace BASS
     void BASSPlayer::TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user)
     {
         GoNextTrack();
-        StartPausePlayback();
     }
 
     int BASSPlayer::GetNextTrackQueueIdx()
@@ -518,6 +542,17 @@ namespace BASS
             return 0;
         else
             return trackQueueIdx + 1;
+    }
+
+    int BASSPlayer::GetPrevTrackQueueIdx()
+    {
+        if(trackQueue.empty())
+            return 0;
+
+        if(trackQueueIdx - 1 <= 0)
+            return trackQueue.size() - 1;
+        else
+            return trackQueueIdx - 1;
     }
 
 	// One liner Setters/Getters
