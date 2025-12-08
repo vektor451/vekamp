@@ -43,7 +43,6 @@ std::wstring GetCoverFilePath(const char fPath[])
 
     std::wstring fileDir = std::filesystem::path(fNameBufStr).remove_filename().wstring();
 
-
     for (const auto& file : std::filesystem::directory_iterator(fileDir))
     {
         std::wstring lowerFileName = file.path().filename().wstring();

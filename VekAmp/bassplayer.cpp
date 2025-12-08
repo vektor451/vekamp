@@ -1,6 +1,7 @@
 #include "utils.hpp"
 #include "bassplayer.hpp"
 
+#include <iterator>
 #include <filesystem>
 #include <string>
 #include <algorithm>
@@ -150,12 +151,17 @@ namespace BASS
     float   	BASSPlayer::volume 			= 1.0;
     int     	BASSPlayer::deviceIdx 		= -1; // -1 = Default Device.
     DWORD   	BASSPlayer::curChannel 		= -1;
+    DWORD       BASSPlayer::queuedChannel{};
     QWORD   	BASSPlayer::trackLen 		= -1;
     std::string BASSPlayer::trackLenStr 	= "0:00";
     std::string BASSPlayer::curFilePath 	= "";
     bool    	BASSPlayer::restartChannel 	= FALSE;
     bool    	BASSPlayer::isPlaying 		= FALSE;
     bool    	BASSPlayer::isScrolling 	= TRUE;
+    int         BASSPlayer::trackQueueIdx = 0;
+
+    std::vector<std::string> BASSPlayer::trackQueue{};
+
 
     BASSUIBackend * BASSPlayer::backendQObj = nullptr;
 
@@ -179,24 +185,22 @@ namespace BASS
 
     void BASSPlayer::Destroy()
     {
+        if(queueThread.joinable())
+            queueThread.join();
+
         if(!BASS_Free())
             BASSError("Couldn't free BASS. (BASS not initialised?)", false);
         else
             qDebug("Bass Freed\n");
     }
 
-    bool BASSPlayer::StartFilePlayback(const char fPath[])
+    bool BASSPlayer::CreateChannelStream(const char fPath[], DWORD *channel)
     {
-        if(!BASS_ChannelStop(curChannel))
-            BASSError("Couldn't stop channel. (No channel set?)", false);
-        
-        if(!BASS_ChannelFree(curChannel))
-            BASSError("Couldn't free channel. (No channel set?)", false);
-        
+        qDebug() << "Creating stream for: " << fPath;
+
         AudioFormat::StreamFormat format = AudioFormat::GetFormat(fPath);
 
         DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
-
 #if _WIN32
         size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
         std::wstring fNameBufStr;
@@ -208,41 +212,81 @@ namespace BASS
 #endif
         // These formats should be definite.
         if(format == AudioFormat::FLAC)
-            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::ALAC)
-            curChannel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::APE)
-            curChannel = BASS_APE_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_APE_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::OPUS)
-            curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         // HACK: These are containers and might have multiple formats. We are going to brute force them.
-        else if(format == AudioFormat::OGG) 
+        else if(format == AudioFormat::OGG)
         {
             // Try as vorbis
-            curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
-            
+            *channel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+
             // If file format invalid, try as OPUS.
             if(BASS_ErrorGetCode() != BASS_OK)
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+                *channel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         }
         else if(format == AudioFormat::M4A)
         {
             // Generic BASS has FLAC support but it's unstable. Try flac before generic.
-            curChannel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
             // If not FLAC, try ALAC, OPUS, and Generic
             if(BASS_ErrorGetCode() != BASS_OK)
-                curChannel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+                *channel = BASS_ALAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
             if(BASS_ErrorGetCode() != BASS_OK)
-                curChannel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+                *channel = BASS_OPUS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
 
             if(BASS_ErrorGetCode() != BASS_OK)
-                curChannel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
+                *channel = BASS_StreamCreateFile(FALSE, fPath, 0, 0, StreamFlags);
         }
         // Can be played by default in BASS, or else it just isn't a valid file.
         else
-            curChannel = BASS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+            *channel = BASS_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
+
+        BASS_ChannelSetSync(*channel, BASS_SYNC_END, 0, TrackFinishedProcess, 0);
+
+        return BASS_ErrorGetCode() == BASS_OK;
+    }
+
+    bool BASSPlayer::StartFilePlayback(const char fPath[], bool queued)
+    {
+        if(!queued)
+        {
+            if(!BASS_ChannelStop(curChannel))
+                BASSError("Couldn't stop channel. (No channel set?)", false);
+
+            if(!BASS_ChannelFree(curChannel))
+                BASSError("Couldn't free channel. (No channel set?)", false);
+
+            BASSPlayer::CreateChannelStream(fPath, &curChannel);
+            qDebug() << "Current Channel: " << curChannel;
+        }
+        else
+        {
+            if(queueThread.joinable())
+            {
+                queueThread.join();
+
+                qDebug() << "Queued Channel: " << queuedChannel;
+
+                if(!BASS_ChannelStop(curChannel))
+                    BASSError("Couldn't stop channel. (No channel set?)", false);
+
+                if(!BASS_ChannelFree(curChannel))
+                    BASSError("Couldn't free channel. (No channel set?)", false);
+
+                curChannel = queuedChannel;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         if(BASS_ErrorGetCode() != BASS_OK)
         {
@@ -291,11 +335,15 @@ namespace BASS
 		}
 
 		isPlaying = false;
+
+        if(!trackQueue.empty())
+            QueueNextTrack();
+
         return true;
     }
 
     void BASSPlayer::StartPausePlayback()
-    {
+    {   
         // RESUME
         if (BASS_ChannelIsActive(curChannel) == BASS_ACTIVE_STOPPED
 		|| BASS_ChannelIsActive(curChannel) == BASS_ACTIVE_PAUSED)
@@ -306,7 +354,10 @@ namespace BASS
                 restartChannel = FALSE;
             }
             else
+            {
+                qDebug() << "Playback failure on channel" << curChannel;
                 BASS::BASSError("Couldn't play file. (Incorrect path?)", FALSE);
+            }
 
 			isPlaying = true;
         }
@@ -420,6 +471,55 @@ namespace BASS
         curFilePath = fPath;
     }
 
+    void BASSPlayer::InitTrackQueue(std::vector<std::string> newQueue)
+    {
+        trackQueueIdx = 0;
+        trackQueue = newQueue;
+        qDebug() << "New Queue: " << trackQueue;
+
+        //QueueNextTrack();
+    }
+
+    void BASSPlayer::GoNextTrack()
+    {
+        trackQueueIdx = GetNextTrackQueueIdx();
+        StartFilePlayback(trackQueue[trackQueueIdx].c_str(), true);
+        qDebug() << "Current track queue idx" << trackQueueIdx;
+    }
+
+    std::thread BASSPlayer::queueThread{};
+
+    void BASSPlayer::QueueNextTrack()
+    {
+        if(queueThread.joinable())
+            queueThread.join();
+
+        if(trackQueue.size() > 1)
+        {
+            int queueIdx = GetNextTrackQueueIdx();
+
+            std::thread queueWork(BASSPlayer::CreateChannelStream, trackQueue[queueIdx].c_str(), &queuedChannel);
+            queueThread.swap(queueWork);
+        }
+    }
+
+    void BASSPlayer::TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user)
+    {
+        GoNextTrack();
+        StartPausePlayback();
+    }
+
+    int BASSPlayer::GetNextTrackQueueIdx()
+    {
+        if(trackQueue.empty())
+            return 0;
+
+        if(trackQueueIdx + 1 >= trackQueue.size())
+            return 0;
+        else
+            return trackQueueIdx + 1;
+    }
+
 	// One liner Setters/Getters
     float       BASSPlayer::GetVolume() 		{return volume;}
 	QWORD       BASSPlayer::GetTrackLen() 		{return trackLen;}
@@ -428,5 +528,7 @@ namespace BASS
     const char *BASSPlayer::GetCurFilePath() 	{return curFilePath.c_str();}
     bool        BASSPlayer::IsPlaying()			{return isPlaying;}
     bool        BASSPlayer::IsScrolling()       {return isScrolling;}
+    int         BASSPlayer::GetTrackQueueIdx()  {return trackQueueIdx;}
+
 
 }

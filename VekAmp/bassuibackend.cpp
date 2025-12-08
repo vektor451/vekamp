@@ -23,9 +23,31 @@ void BASSUIBackend::qFileSelect(QUrl fPath)
     }
 }
 
+void BASSUIBackend::qMultifileSelect(QStringList fPaths)
+{
+    std::vector<std::string> queueVec;
+    for(const auto& file : fPaths)
+    {
+        QUrl fPathUrl (file);
+        queueVec.push_back(fPathUrl.toLocalFile().toUtf8().toStdString());
+    }
+    BASS::BASSPlayer::InitTrackQueue(queueVec);
+}
+
 void BASSUIBackend::qPlayPause()
 {
     BASS::BASSPlayer::StartPausePlayback();
+}
+
+void BASSUIBackend::qNextTrack()
+{
+    BASS::BASSPlayer::GoNextTrack();
+    BASS::BASSPlayer::StartPausePlayback();
+}
+
+void BASSUIBackend::qPrevHomeTrack()
+{
+
 }
 
 QString BASSUIBackend::qGetTrackLenStr()

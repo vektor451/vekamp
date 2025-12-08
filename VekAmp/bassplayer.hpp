@@ -10,6 +10,8 @@
 #include <bassape.h> 
 #include <bassflac.h> 
 #include <bassopus.h>
+#include <thread>
+#include <atomic>
 
 namespace BASS 
 {
@@ -49,7 +51,8 @@ namespace BASS
             // Functions
             static void Init();
             static void Destroy();
-            static bool StartFilePlayback(const char fPath[]);
+            static bool CreateChannelStream(const char fPath[], DWORD *channel);
+            static bool StartFilePlayback(const char fPath[], bool queued = false);
             static void StartPausePlayback();
             static void StopPlayback();
             static void StartScroll();
@@ -68,20 +71,32 @@ namespace BASS
             static const char *GetCurFilePath();
             static bool IsPlaying();
             static bool IsScrolling();
+            static int GetTrackQueueIdx();
+            static int GetNextTrackQueueIdx();
+            static void InitTrackQueue(std::vector<std::string> newQueue);
+            static void GoNextTrack();
+            static void GoPrevTrack();
         
         private:
             // Varibales
             static DWORD curChannel;
+            static DWORD queuedChannel;
             static QWORD trackLen;
             static std::string trackLenStr;
             static std::string curFilePath;
             static bool isPlaying;
             static bool isScrolling;
+            static std::vector<std::string> trackQueue;
+            static int trackQueueIdx;
             
             static int deviceIdx;
             static bool restartChannel;
             static float volume;
 
+            static std::thread queueThread;
+
             // Functions
+            static void QueueNextTrack();
+            static void CALLBACK TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user);
     };
 }

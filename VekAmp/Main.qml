@@ -93,8 +93,21 @@ Window {
     FileDialog{
         id: fileDialog
         currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
-        title: qsTr("Open audio file...")
-        onAccepted: bassUI.qFileSelect(selectedFile)
+        title: qsTr("Open audio file(s)...")
+        onAccepted: {
+            bassUI.qMultifileSelect(selectedFiles)
+            bassUI.qFileSelect(selectedFile);
+        }
+        fileMode: FileDialog.OpenFiles
+    }
+
+    FileDialog{
+        id: playlistDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
+        title: qsTr("Open playlist...")
+        nameFilters: ["MP3 URL Playlist (*.m3u *.m3u8)"]
+        //onAccepted: bassUI.qFileSelect(selectedFile)
+        fileMode: FileDialog.OpenFile
     }
 
     Window{
@@ -154,8 +167,12 @@ Window {
                     title: qsTr("&File")
 
                     Action{
-                        text: qsTr("Open &File")
+                        text: qsTr("Open &File(s)")
                         onTriggered: fileDialog.open();
+                    }
+                    Action{
+                        text: qsTr("Open &Playlist")
+                        onTriggered: playlistDialog.open();
                     }
                 }
                 Menu{
@@ -308,6 +325,8 @@ Window {
                         Layout.preferredWidth: 2
                         Layout.minimumHeight: 32
                         Layout.minimumWidth: 32
+
+                        onClicked: bassUI.qNextTrack();
                     }
 
                     ColumnLayout{
@@ -338,7 +357,7 @@ Window {
                             Layout.fillWidth: true
                             from: 0
                             value: 0
-                            to: 1
+                            to: 0.9995 // so many 9s
                             live: true
 
                             onMoved: {

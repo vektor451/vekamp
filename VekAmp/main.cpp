@@ -42,5 +42,7 @@ int main(int argc, char *argv[])
         BASS::BASSPlayer::StartPausePlayback();
     }
 
-    return app.exec();
+    int exit = app.exec();
+    BASS::BASSPlayer::Destroy();
+    return exit;
 }
