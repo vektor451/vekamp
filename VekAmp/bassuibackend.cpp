@@ -61,6 +61,19 @@ bool BASSUIBackend::qIsPlaying()
     return BASS::BASSPlayer::IsPlaying();
 }
 
+bool BASSUIBackend::qToggleShuffleMode()
+{
+    BASS::BASSPlayer::ToggleShuffleMode();
+    return BASS::BASSPlayer::GetShuffleMode();
+}
+
+int BASSUIBackend::qToggleRepeatMode()
+{
+    BASS::BASSPlayer::ToggleRepeatMode();
+
+    return (int)BASS::BASSPlayer::GetRepeatMode();
+}
+
 QString BASSUIBackend::qGetTrackLenStr()
 {
     std::string TrackProgress = BASS::BASSPlayer::GetTrackProgressStr(BASS::BASSPlayer::GetTrackProgressSecs());

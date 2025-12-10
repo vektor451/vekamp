@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="16"
-   height="16"
-   viewBox="0 0 16 16"
+   width="20"
+   height="20"
+   viewBox="0 0 20 20"
    version="1.1"
    id="svg1"
    sodipodi:docname="noShuffle.svg"
@@ -24,9 +24,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="32"
-     inkscape:cx="6.125"
-     inkscape:cy="10.984375"
+     inkscape:zoom="16"
+     inkscape:cx="10.5625"
+     inkscape:cy="13.90625"
      inkscape:window-width="1920"
      inkscape:window-height="1027"
      inkscape:window-x="-8"
@@ -55,18 +55,18 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       id="rect56"
-       width="16"
+       style="fill:#ffffff;stroke:none;stroke-width:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers;fill-opacity:1"
+       id="rect18"
+       width="20"
        height="2"
        x="0"
        y="3" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       id="rect57"
-       width="16"
+       id="rect19"
+       width="20"
        height="2"
        x="0"
-       y="11" />
+       y="15" />
   </g>
 </svg>

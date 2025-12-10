@@ -11,7 +11,6 @@
 #include <bassflac.h> 
 #include <bassopus.h>
 #include <thread>
-#include <atomic>
 
 namespace BASS 
 {
@@ -49,6 +48,7 @@ namespace BASS
                 NoRepeat,
                 Repeat,
                 RepeatTrack,
+                Count,
             };
 
             // Variables
@@ -66,6 +66,7 @@ namespace BASS
             static void SetPos(double pos);
             static double GetTrackProgressSecs();
             static std::string GetTrackProgressStr(double pos);
+            static void ToggleRepeatMode();
 
             // Getters & setters.
             static void SetVolume(float vol);
@@ -83,6 +84,9 @@ namespace BASS
             static void InitTrackQueue(std::vector<std::string> newQueue);
             static void GoNextTrack();
             static void GoPrevTrack();
+            static RepeatMode GetRepeatMode();
+            static bool GetShuffleMode();
+            static void ToggleShuffleMode();
         
         private:
             // Varibales

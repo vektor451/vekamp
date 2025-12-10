@@ -18,6 +18,8 @@ public:
     Q_INVOKABLE void qNextTrack();
     Q_INVOKABLE void qPrevHomeTrack();
     Q_INVOKABLE bool qIsPlaying();
+    Q_INVOKABLE bool qToggleShuffleMode();
+    Q_INVOKABLE int  qToggleRepeatMode();
 
     Q_INVOKABLE QString qGetTrackLenStr();
     Q_INVOKABLE qreal qGetTrackLen();

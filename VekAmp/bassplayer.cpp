@@ -157,8 +157,11 @@ namespace BASS
     std::string BASSPlayer::curFilePath 	= "";
     bool    	BASSPlayer::restartChannel 	= FALSE;
     bool    	BASSPlayer::isPlaying 		= FALSE;
+    bool    	BASSPlayer::shuffleMode 	= FALSE;
     bool    	BASSPlayer::isScrolling 	= TRUE;
     int         BASSPlayer::trackQueueIdx = 0;
+
+    BASSPlayer::RepeatMode BASSPlayer::repeatMode{};
 
     std::vector<std::string> BASSPlayer::trackQueue{};
 
@@ -460,6 +463,15 @@ namespace BASS
 		return returnVal;
 	}
 
+    void BASSPlayer::ToggleRepeatMode()
+    {
+        repeatMode = (BASSPlayer::RepeatMode)(repeatMode + 1);
+        if(repeatMode == RepeatMode::Count)
+        {
+            repeatMode = (BASSPlayer::RepeatMode)0;
+        }
+    }
+
     // Setters & Getters
     void BASSPlayer::SetVolume(float vol)
     {
@@ -523,6 +535,11 @@ namespace BASS
         qDebug() << "Current track queue idx" << trackQueueIdx;
     }
 
+    void BASSPlayer::ToggleShuffleMode()
+    {
+        shuffleMode = !shuffleMode;
+    }
+
     std::thread BASSPlayer::queueThread{};
 
     void BASSPlayer::QueueNextTrack()
@@ -573,8 +590,11 @@ namespace BASS
     const char *BASSPlayer::GetTrackLenStr() 	{return trackLenStr.c_str();}
     const char *BASSPlayer::GetCurFilePath() 	{return curFilePath.c_str();}
     bool        BASSPlayer::IsPlaying()			{return isPlaying;}
+    bool        BASSPlayer::GetShuffleMode()	{return shuffleMode;}
     bool        BASSPlayer::IsScrolling()       {return isScrolling;}
     int         BASSPlayer::GetTrackQueueIdx()  {return trackQueueIdx;}
+
+    BASSPlayer::RepeatMode BASSPlayer::GetRepeatMode() {return repeatMode;}
 
 
 }

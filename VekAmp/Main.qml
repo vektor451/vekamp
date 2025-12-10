@@ -464,7 +464,7 @@ Window {
                     }
 
                     Button{
-                        icon.source: "/Resources/controlIcons/repeatOne.svg"
+                        icon.source: "/Resources/controlIcons/noRepeat.svg"
                         icon.height: 20
                         icon.width: 20
                         Layout.leftMargin: 12
@@ -477,11 +477,24 @@ Window {
                         Layout.minimumWidth: 32
                         flat: true
 
-                        onClicked: bassUI.qNextTrack();
+                        onClicked: {
+                            let repeatNum = bassUI.qToggleRepeatMode();
+                            switch (repeatNum) {
+                                case 0:
+                                    icon.source = "/Resources/controlIcons/noRepeat.svg"
+                                    break;
+                                case 1:
+                                    icon.source = "/Resources/controlIcons/repeat.svg"
+                                    break;
+                                case 2:
+                                    icon.source = "/Resources/controlIcons/repeatOne.svg"
+                                    break;
+                            }
+                        }
                     }
 
                     Button{
-                        icon.source: "/Resources/controlIcons/shuffle.svg"
+                        icon.source: "/Resources/controlIcons/noShuffle.svg"
                         icon.height: 20
                         icon.width: 20
                         Layout.bottomMargin: 4
@@ -493,7 +506,16 @@ Window {
                         Layout.minimumWidth: 32
                         flat: true
 
-                        onClicked: bassUI.qNextTrack();
+                        onClicked: {
+                            if(bassUI.qToggleShuffleMode())
+                            {
+                                icon.source = "/Resources/controlIcons/shuffle.svg"
+                            }
+                            else
+                            {
+                                icon.source = "/Resources/controlIcons/noShuffle.svg"
+                            }
+                        }
                     }
                 }
             }
