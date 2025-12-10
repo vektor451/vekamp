@@ -558,6 +558,7 @@ namespace BASS
 
     void BASSPlayer::TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user)
     {
+        // TODO: add options for next/prev to prevent repeating queue or not.
         if (repeatMode == BASSPlayer::RepeatMode::RepeatTrack)
         {
             SetPos(0);
