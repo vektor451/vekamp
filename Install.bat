@@ -5,3 +5,4 @@ copy .\VekAmp\Dependencies\BASS\Lib\bassalac.dll C:\PROGRA~2\VekAmp\bin\
 copy .\VekAmp\Dependencies\BASS\Lib\bassape.dll C:\PROGRA~2\VekAmp\bin\
 copy .\VekAmp\Dependencies\BASS\Lib\bassflac.dll C:\PROGRA~2\VekAmp\bin\
 copy .\VekAmp\Dependencies\BASS\Lib\bassopus.dll C:\PROGRA~2\VekAmp\bin\
+copy .\VekAmp\Resources\interFont\OFL.txt C:\PROGRA~2\VekAmp\bin\interFontOFL.txt
