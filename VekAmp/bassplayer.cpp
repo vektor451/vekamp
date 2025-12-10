@@ -544,10 +544,10 @@ namespace BASS
 
     void BASSPlayer::QueueNextTrack()
     {
-        if(queueThread.joinable())
+        if (queueThread.joinable())
             queueThread.join();
 
-        if(trackQueue.size() > 1)
+        if (trackQueue.size() > 1)
         {
             int queueIdx = GetNextTrackQueueIdx();
 
@@ -558,7 +558,27 @@ namespace BASS
 
     void BASSPlayer::TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user)
     {
-        GoNextTrack();
+        if (repeatMode == BASSPlayer::RepeatMode::RepeatTrack)
+        {
+            SetPos(0);
+            StartPausePlayback();
+            return;
+        }
+        else if (repeatMode == BASSPlayer::RepeatMode::Repeat)
+        {
+            GoNextTrack();
+        }
+        else
+        {
+            bool repeatQueue = GetNextTrackQueueIdx() == 0;
+
+            GoNextTrack();
+
+            if(repeatQueue)
+            {
+                StartPausePlayback(); // This will stop playback.
+            }
+        }
     }
 
     int BASSPlayer::GetNextTrackQueueIdx()
