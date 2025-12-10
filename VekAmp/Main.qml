@@ -8,6 +8,7 @@ import QtQuick.Dialogs
 import VekAmp
 
 Window {
+    id: window;
     width: 960
     height: 600
     minimumWidth: 640
@@ -16,6 +17,26 @@ Window {
     title: qsTr("VekAmp")
 
     //palette.highlight: "#cc3366" palette only works with ApplicationWindow, which none of the editors support as a root element.
+
+    FontLoader{
+        id: interFont;
+        source: "/Resources/interFont/Inter_18pt-Regular.ttf"
+    }
+
+    FontLoader{
+        id: interFontBold;
+        source: "/Resources/interFont/Inter_18pt-Medium.ttf"
+    }
+
+    FontLoader{
+        id: interFontItalic;
+        source: "/Resources/interFont/Inter_18pt-Italic.ttf"
+    }
+
+    FontLoader{
+        id: interFontBoldItalic;
+        source: "/Resources/interFont/Inter_18pt-MediumItalic.ttf"
+    }
 
     DropArea{
         id: fileDrop
@@ -55,6 +76,7 @@ Window {
 
         Pane{
             anchors.fill: parent;
+            font: interFont.font;
 
             ColumnLayout{
                 anchors.fill: parent;
@@ -127,6 +149,7 @@ Window {
         Pane{
             anchors.fill: parent
             padding: 8
+            font: interFont.font;
 
             ColumnLayout{
                 anchors.fill: parent
@@ -159,6 +182,7 @@ Window {
     Pane{
         anchors.fill: parent
         padding: 0
+        font.family: interFont.font.family;
 
         ColumnLayout{
             anchors.fill: parent
