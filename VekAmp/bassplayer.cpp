@@ -373,6 +373,9 @@ namespace BASS
 
 			isPlaying = false;
         }
+
+        if(backendQObj)
+            backendQObj->EmitPlayStateChanged();
     }
 
     void BASSPlayer::StopPlayback()
@@ -491,6 +494,10 @@ namespace BASS
         else if(trackQueue.size() == 1)
         {
             SetPos(0);
+            if(!isPlaying)
+            {
+                StartPausePlayback();
+            }
         }
 
         qDebug() << "Current track queue idx" << trackQueueIdx;
@@ -507,6 +514,10 @@ namespace BASS
         else if(trackQueue.size() == 1)
         {
             SetPos(0);
+            if(!isPlaying)
+            {
+                StartPausePlayback();
+            }
         }
 
         qDebug() << "Current track queue idx" << trackQueueIdx;

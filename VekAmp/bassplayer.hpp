@@ -45,6 +45,12 @@ namespace BASS
 
     class BASSPlayer {
         public:
+            enum RepeatMode{
+                NoRepeat,
+                Repeat,
+                RepeatTrack,
+            };
+
             // Variables
             static BASSUIBackend * backendQObj;
 
@@ -93,6 +99,9 @@ namespace BASS
             static int deviceIdx;
             static bool restartChannel;
             static float volume;
+
+            static RepeatMode repeatMode;
+            static bool shuffleMode;
 
             static std::thread queueThread;
 

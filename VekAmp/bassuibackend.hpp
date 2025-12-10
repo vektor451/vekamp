@@ -17,6 +17,7 @@ public:
     Q_INVOKABLE void qPlayPause();
     Q_INVOKABLE void qNextTrack();
     Q_INVOKABLE void qPrevHomeTrack();
+    Q_INVOKABLE bool qIsPlaying();
 
     Q_INVOKABLE QString qGetTrackLenStr();
     Q_INVOKABLE qreal qGetTrackLen();
@@ -28,9 +29,11 @@ public:
 
     void EmitTrackChange();
     void EmitErrorMessage(QString message);
+    void EmitPlayStateChanged();
 
 signals:
     void trackChanged();
+    void playStateChanged();
     void bassError(QString message);
 };
 

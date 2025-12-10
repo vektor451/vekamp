@@ -33,10 +33,14 @@ Window {
         onTrackChanged: {
             trackName.text = tagUI.qGetCurTrackName();
             tagUI.qUpdateAlbumCover();
+            playButton.updatePlayingIcon();
         }
         onBassError: {
             bassERROR.show();
             bassERRORText.text = message;
+        }
+        onPlayStateChanged: {
+            playButton.updatePlayingIcon();
         }
     }
 
@@ -154,11 +158,11 @@ Window {
 
     Pane{
         anchors.fill: parent
-        padding: 2
+        padding: 0
 
         ColumnLayout{
             anchors.fill: parent
-            spacing: 2
+            spacing: 0
 
             MenuBar{
                 Layout.fillWidth: true
@@ -171,6 +175,7 @@ Window {
                         onTriggered: fileDialog.open();
                     }
                     Action{
+                        // Right now M3U is too non-standard for me to really care for adding support.
                         text: qsTr("Open &Playlist")
                         onTriggered: playlistDialog.open();
                     }
@@ -291,7 +296,9 @@ Window {
                     anchors.fill: parent
                     spacing: 4
                     Button{
-                        text: qsTr("<")
+                        icon.source: "/Resources/controlIcons/prev.svg"
+                        icon.height: 16
+                        icon.width: 16
                         Layout.bottomMargin: 4
                         Layout.topMargin: 4
                         Layout.margins: 0
@@ -299,12 +306,18 @@ Window {
                         Layout.preferredWidth: 2
                         Layout.minimumHeight: 32
                         Layout.minimumWidth: 32
+                        flat: true
 
-                        onClicked: bassUI.qPrevHomeTrack();
+                        onClicked: {
+                            bassUI.qPrevHomeTrack();
+                        }
                     }
 
                     Button{
-                        text: qsTr("P")
+                        id: playButton;
+                        icon.source: "/Resources/controlIcons/play.svg"
+                        icon.height: 16
+                        icon.width: 16
                         Layout.bottomMargin: 4
                         Layout.topMargin: 4
                         Layout.margins: 0
@@ -312,12 +325,29 @@ Window {
                         Layout.preferredWidth: 2
                         Layout.minimumHeight: 32
                         Layout.minimumWidth: 32
+                        flat: true
 
-                        onClicked: bassUI.qPlayPause();
+                        function updatePlayingIcon(){
+                            if(bassUI.qIsPlaying())
+                            {
+                                icon.source = "/Resources/controlIcons/pause.svg"
+                            }
+                            else
+                            {
+                                icon.source = "/Resources/controlIcons/play.svg"
+                            }
+                        }
+
+                        onClicked: {
+                            bassUI.qPlayPause();
+                            updatePlayingIcon();
+                        }
                     }
 
                     Button{
-                        text: qsTr(">")
+                        icon.source: "/Resources/controlIcons/next.svg"
+                        icon.height: 16
+                        icon.width: 16
                         Layout.bottomMargin: 4
                         Layout.topMargin: 4
                         Layout.margins: 0
@@ -325,8 +355,11 @@ Window {
                         Layout.preferredWidth: 2
                         Layout.minimumHeight: 32
                         Layout.minimumWidth: 32
+                        flat: true
 
-                        onClicked: bassUI.qNextTrack();
+                        onClicked: {
+                            bassUI.qNextTrack();
+                        }
                     }
 
                     ColumnLayout{
@@ -357,7 +390,7 @@ Window {
                             Layout.fillWidth: true
                             from: 0
                             value: 0
-                            to: 0.9995 // so many 9s
+                            to: 0.9995
                             live: true
 
                             onMoved: {
@@ -409,10 +442,17 @@ Window {
                         }
                     }
 
+                    VectorImage{
+                        source: "/Resources/controlIcons/speaker.svg"
+                        height: 16
+                        width: 16
+                        preferredRendererType: VectorImage.CurveRenderer
+                    }
+
                     Slider{
                         id: volumeSlider
-                        width: 128
-                        Layout.maximumWidth: 128
+                        width: 96
+                        Layout.maximumWidth: 96
                         Layout.minimumWidth: 64
                         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
@@ -421,6 +461,39 @@ Window {
                         to: 0.8
 
                         onValueChanged: bassUI.qSetVolume(value)
+                    }
+
+                    Button{
+                        icon.source: "/Resources/controlIcons/repeatOne.svg"
+                        icon.height: 20
+                        icon.width: 20
+                        Layout.leftMargin: 12
+                        Layout.bottomMargin: 4
+                        Layout.topMargin: 4
+                        Layout.margins: 0
+                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: 2
+                        Layout.minimumHeight: 32
+                        Layout.minimumWidth: 32
+                        flat: true
+
+                        onClicked: bassUI.qNextTrack();
+                    }
+
+                    Button{
+                        icon.source: "/Resources/controlIcons/shuffle.svg"
+                        icon.height: 20
+                        icon.width: 20
+                        Layout.bottomMargin: 4
+                        Layout.topMargin: 4
+                        Layout.margins: 0
+                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: 2
+                        Layout.minimumHeight: 32
+                        Layout.minimumWidth: 32
+                        flat: true
+
+                        onClicked: bassUI.qNextTrack();
                     }
                 }
             }

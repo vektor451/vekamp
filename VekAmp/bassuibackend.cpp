@@ -56,6 +56,11 @@ void BASSUIBackend::qPrevHomeTrack()
     }
 }
 
+bool BASSUIBackend::qIsPlaying()
+{
+    return BASS::BASSPlayer::IsPlaying();
+}
+
 QString BASSUIBackend::qGetTrackLenStr()
 {
     std::string TrackProgress = BASS::BASSPlayer::GetTrackProgressStr(BASS::BASSPlayer::GetTrackProgressSecs());
@@ -103,5 +108,10 @@ void BASSUIBackend::EmitTrackChange()
 void BASSUIBackend::EmitErrorMessage(QString message)
 {
     emit bassError(message);
+}
+
+void BASSUIBackend::EmitPlayStateChanged()
+{
+    emit playStateChanged();
 }
 
