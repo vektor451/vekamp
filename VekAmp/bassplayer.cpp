@@ -309,15 +309,6 @@ namespace BASS
         qDebug("Playing back path: %s", fPath);
         SetCurFilePath(fPath);
 
-        if(backendQObj)
-        {
-            backendQObj->EmitTrackChange();
-        }
-        else
-        {
-            qDebug("backendQObj is a nullptr! Cannot emit signals.");
-        }
-
         trackLen = BASS_ChannelGetLength(curChannel, BASS_POS_BYTE);
         if(trackLen != -1)
         {
@@ -336,6 +327,15 @@ namespace BASS
 			BASSError("Could not get track length. (Invalid file?)", false);
 			trackLenStr = "0:00";
 		}
+
+        if(backendQObj)
+        {
+            backendQObj->EmitTrackChange();
+        }
+        else
+        {
+            qDebug("backendQObj is a nullptr! Cannot emit signals.");
+        }
 
 		isPlaying = false;
 

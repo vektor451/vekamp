@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
+#include "fileref.h"
 
 class TagUIBackend : public QObject
 {
@@ -11,7 +12,11 @@ class TagUIBackend : public QObject
 public:
     explicit TagUIBackend(QObject *parent = nullptr);
     Q_INVOKABLE QString qGetCurTrackName();
+    Q_INVOKABLE QString qGetTrackDetailStr();
     Q_INVOKABLE void qUpdateAlbumCover();
+
+private:
+    TagLib::FileRef GetCurTrackFileRef();
 
 signals:
     void updateImage();

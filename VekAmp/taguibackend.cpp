@@ -4,7 +4,6 @@
 #include "flacpicture.h"
 #include "flacfile.h"
 #include "mpegfile.h"
-#include "id3v2.h"
 #include "attachedpictureframe.h"
 #include "id3v2tag.h"
 #include "bassplayer.hpp"
@@ -13,8 +12,8 @@
 
 #include <string>
 #include <filesystem>
-#include <fstream>
 #include <QDebug>
+#include <format>
 
 TagUIBackend::TagUIBackend(QObject *parent)
     : QObject{parent}
@@ -24,17 +23,7 @@ QString TagUIBackend::qGetCurTrackName()
 {
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-#if _WIN32
-    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
-    std::wstring fNameBufStr;
-    fNameBufStr.resize(fNameLength);
-    MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
-    const WCHAR *fNameBuf = fNameBufStr.c_str();
-#else
-    const char *fNameBuf = fPath;
-#endif
-
-    TagLib::FileRef file(fNameBuf);
+    TagLib::FileRef file = GetCurTrackFileRef();
     TagLib::String title = file.tag()->title();
     TagLib::String artist = file.tag()->artist();
 
@@ -61,22 +50,79 @@ QString TagUIBackend::qGetCurTrackName()
     return finalString;
 }
 
+QString TagUIBackend::qGetTrackDetailStr()
+{
+    const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
+
+    TagLib::FileRef file = GetCurTrackFileRef();
+
+    TagLib::String title = file.tag()->title();
+    TagLib::String artist = file.tag()->artist();
+    TagLib::String album = file.tag()->album();
+    int year = file.tag()->year();
+
+    int bitRate = file.audioProperties()->bitrate();
+    int sampleRate = file.audioProperties()->sampleRate();
+    int channels = file.audioProperties()->channels();
+
+    QString outString = "<style type=\"text/css\">p { margin-top: 2px; margin-bottom: 2px; }</style>";
+
+    if(!title.isEmpty())
+    {
+        outString += std::format("<p><b>{}</b>", title.toCString(true));
+    }
+    else
+    {
+        outString += std::format("<p>{}", std::filesystem::path(curFilePath).stem().string());
+    }
+
+    if(!artist.isEmpty())
+    {
+        outString += std::format("<p>{}", artist.toCString(true));
+    }
+
+
+    if(!artist.isEmpty())
+    {
+       outString += std::format("<p>{}", album.toCString(true));
+
+        if(year != 0)
+        {
+            outString += std::format(" ({})", std::to_string(year));
+        }
+
+        outString += "";
+    }
+
+    std::string fileExt = std::filesystem::path(curFilePath).extension().string().erase(0, 1);
+    std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), [](const char &c){ return std::toupper(c); });
+
+    std::string channelString;
+    if(channels == 1)
+    {
+        channelString = "Mono";
+    }
+    else if(channels == 2)
+    {
+        channelString = "Stereo";
+    }
+    else
+    {
+        channelString = std::format("{} channels", channels);
+    }
+
+    outString += std::format("<p><font color=grey><small>{}, {} kHz, {}k, {}, {}</font></small>",
+                             fileExt, (double)sampleRate / 1000, bitRate, channelString, BASS::BASSPlayer::GetTrackLenStr());
+
+    return outString;
+}
+
 // TODO: run this on a seperate thread.
 void TagUIBackend::qUpdateAlbumCover()
 {
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-#if _WIN32
-    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
-    std::wstring fNameBufStr;
-    fNameBufStr.resize(fNameLength);
-    MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
-    const WCHAR *fNameBuf = fNameBufStr.c_str();
-#else
-    const char *fNameBuf = fPath;
-#endif
-
-    TagLib::FileRef file(fNameBuf);
+    TagLib::FileRef file = GetCurTrackFileRef();
 
     std::wstring coverfPath = GetCoverFilePath(curFilePath);
     QString qcoverfPath = QString::fromStdWString(coverfPath);
@@ -115,6 +161,24 @@ void TagUIBackend::qUpdateAlbumCover()
     CoverImageProvider::coverFilePath = qcoverfPath;
 
     emit updateImage();
+}
+
+TagLib::FileRef TagUIBackend::GetCurTrackFileRef()
+{
+    const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
+
+#if _WIN32
+    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
+    std::wstring fNameBufStr;
+    fNameBufStr.resize(fNameLength);
+    MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
+    const WCHAR *fNameBuf = fNameBufStr.c_str();
+#else
+    const char *fNameBuf = fPath;
+#endif
+
+    TagLib::FileRef file(fNameBuf);
+    return file;
 }
 
 
