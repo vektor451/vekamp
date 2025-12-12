@@ -575,7 +575,7 @@ namespace BASS
 
             GoNextTrack();
 
-            if(repeatQueue)
+            if(repeatQueue && trackQueue.size() != 1)
             {
                 StartPausePlayback(); // This will stop playback.
             }
