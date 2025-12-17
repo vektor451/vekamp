@@ -13,14 +13,17 @@ The main motivation for this project is to replace my currently used music playe
 ## Current Plans
 The plans for the current stage of development are as follows: 
 - [x] Basic media playback functionalities. (Play/Pause, Duration/Position, Volume)
-- [ ] Track Queue.
-- [ ] More playback functionalities. (Previous, Next, Loop Mode)
-- [ ] Read playlists.
+- [x] Track Queue.
+- [x] More playback functionalities. (Previous, Next, Loop Mode)
 - [x] Read metadata.
 - [x] Extract album art and display it.
+- [ ] Proper port to Linux.
+
+Abandoned plans: 
+- Reading Playlists (I'll probably add M3U support later, but the standard is so... non-standardized that it's too much to bother with for now)
 
 ## Platforms
 This branch has only been tested on windows.
 
-## Compiling
-Compilation is done via QtCreator 18 with Qt 6.10.0. 
+## Building
+Building on windows is currently done via QtCreator 18 with Qt 6.10.0, using MSBuild and MSVC from Visual Studio 2026. Other versions of Qt and VS might work, but this is the version that has been currently tested.  
