@@ -33,6 +33,9 @@ int main(int argc, char *argv[])
     engine.addImageProvider("coverImage", new CoverImageProvider);
     engine.loadFromModule("VekAmp", "Main");
 
+    // Init RNG;
+    srand(time(NULL));
+
     // Bass Init
     BASS::BASSPlayer::Init();
 

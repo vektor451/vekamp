@@ -79,7 +79,7 @@ namespace BASS
             static bool IsPlaying();
             static bool IsScrolling();
             static int GetTrackQueueIdx();
-            static int GetNextTrackQueueIdx();
+            static int GetNextTrackQueueIdx(bool shuffle = false);
             static int GetPrevTrackQueueIdx();
             static void InitTrackQueue(std::vector<std::string> newQueue);
             static void GoNextTrack();
@@ -98,6 +98,7 @@ namespace BASS
             static bool isPlaying;
             static bool isScrolling;
             static std::vector<std::string> trackQueue;
+            static std::vector<int> trackHistory;
             static int trackQueueIdx;
             
             static int deviceIdx;

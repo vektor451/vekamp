@@ -73,7 +73,7 @@ QString TagUIBackend::qGetTrackDetailStr()
     }
     else
     {
-        outString += std::format("<p>{}", std::filesystem::path(curFilePath).stem().string());
+        outString += std::format("<p><b>{}</b>", std::filesystem::path(curFilePath).stem().string());
     }
 
     if(!artist.isEmpty())
@@ -82,7 +82,7 @@ QString TagUIBackend::qGetTrackDetailStr()
     }
 
 
-    if(!artist.isEmpty())
+    if(!album.isEmpty())
     {
        outString += std::format("<p>{}", album.toCString(true));
 
@@ -92,6 +92,13 @@ QString TagUIBackend::qGetTrackDetailStr()
         }
 
         outString += "";
+    }
+    else
+    {
+        if(year != 0)
+        {
+            outString += std::format("<p>{}", std::to_string(year));
+        }
     }
 
     std::string fileExt = std::filesystem::path(curFilePath).extension().string().erase(0, 1);

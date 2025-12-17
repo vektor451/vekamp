@@ -163,7 +163,8 @@ namespace BASS
 
     BASSPlayer::RepeatMode BASSPlayer::repeatMode{};
 
-    std::vector<std::string> BASSPlayer::trackQueue{};
+    std::vector<std::string>    BASSPlayer::trackQueue{};
+    std::vector<int>            BASSPlayer::trackHistory{};
 
 
     BASSUIBackend * BASSPlayer::backendQObj = nullptr;
@@ -342,6 +343,11 @@ namespace BASS
         if(!trackQueue.empty())
             QueueNextTrack();
 
+        if(!std::count(std::begin(trackHistory), std::end(trackHistory), trackQueueIdx))
+        {
+            trackHistory.push_back(trackQueueIdx);
+        }
+
         return true;
     }
 
@@ -500,7 +506,7 @@ namespace BASS
         if(trackQueue.size() > 1)
         {
             trackQueueIdx = GetNextTrackQueueIdx();
-            StartFilePlayback(trackQueue[trackQueueIdx].c_str(), true);
+            StartFilePlayback(trackQueue[trackQueueIdx].c_str(), !shuffleMode);
             StartPausePlayback();
         }
         else if(trackQueue.size() == 1)
@@ -582,15 +588,49 @@ namespace BASS
         }
     }
 
-    int BASSPlayer::GetNextTrackQueueIdx()
+    int BASSPlayer::GetNextTrackQueueIdx(bool shuffle)
     {
         if(trackQueue.empty())
             return 0;
 
         if(trackQueueIdx + 1 >= trackQueue.size())
+        {
             return 0;
+        }
         else
+        {
+            if(shuffleMode)
+            {
+                std::vector<int> potentialTracks{};
+
+                for(int i = 0; i < trackQueue.size(); i++)
+                {
+                    if(!std::count(std::begin(trackHistory), std::end(trackHistory), i))
+                    {
+                        potentialTracks.push_back(i);
+                    }
+                }
+
+                // no tracks left to shuffle to!
+                if(!potentialTracks.size())
+                {
+                    std::vector<int> newTrackHistory;
+                    for(int i = 1; i < (trackQueue.size() / 3) + 1; i++)
+                    {
+                        newTrackHistory.push_back(trackHistory[trackHistory.size() - i]);
+                    }
+                    trackHistory = newTrackHistory;
+                    return GetNextTrackQueueIdx(true);
+                }
+
+                qDebug() << "Played track history: " << trackHistory;
+                qDebug() << "Potential shuffle tracks: " << potentialTracks;
+
+                return potentialTracks[rand() % potentialTracks.size()];
+            }
+
             return trackQueueIdx + 1;
+        }
     }
 
     int BASSPlayer::GetPrevTrackQueueIdx()
