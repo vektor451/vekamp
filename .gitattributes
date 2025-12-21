@@ -2,4 +2,4 @@
 * text=auto
 
 # Mark dependencies as vendored. 
-VekAmp/Dependencies/* linguist-vendored
+VekAmp/Dependencies/** linguist-vendored
