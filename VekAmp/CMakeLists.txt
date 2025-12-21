@@ -1,0 +1,175 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(VekAmp VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Quick)
+
+
+if(WIN32)
+    set(TAGLIB_PATH C:/taglib)
+    set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
+    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
+endif(WIN32)
+if(UNIX)
+    set(TAGLIB_PATH ~/taglib)
+    set(TAGLIB_INCLUDE_PATH ~/taglib/include/taglib)
+    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
+endif(UNIX)
+
+find_package(TagLib 2.1.1 REQUIRED)
+
+qt_standard_project_setup(REQUIRES 6.8)
+
+if(WIN32)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Resources/appicon.rc")
+endif (WIN32)
+
+qt_add_executable(appVekAmp
+    main.cpp
+    bassplayer.cpp
+    utils.cpp
+
+    ${app_icon_resource_windows}
+)
+
+qt_add_qml_module(appVekAmp
+    URI VekAmp
+    QML_FILES
+        Main.qml
+    SOURCES
+        bassuibackend.hpp
+        bassuibackend.cpp
+        miscuibackend.hpp
+        miscuibackend.cpp
+        coverimageprovider.hpp
+        coverimageprovider.cpp
+        taguibackend.h
+        taguibackend.cpp
+    RESOURCES
+        resources.qrc
+        Resources/appicon.rc
+)
+
+string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)
+
+add_custom_target(
+    clear_cache
+    COMMAND ${CMAKE_COMMAND} -U BUILD_TIME ${CMAKE_BINARY_DIR}
+)
+
+add_dependencies(appVekAmp clear_cache)
+
+target_compile_definitions(appVekAmp PRIVATE
+    VEKAMP_NAME="${CMAKE_PROJECT_NAME}"
+    VEKAMP_VER="${CMAKE_PROJECT_VERSION}"
+    BUILD_TIME="${BUILD_TIME}"
+)
+
+set(BASS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS)
+set(BASS_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS/Lib)
+
+target_include_directories(appVekAmp PUBLIC
+    ${BASS_DIR}
+    ${TAGLIB_INCLUDE_PATH}
+)
+
+add_library(BASS SHARED IMPORTED)
+add_library(BASSALAC SHARED IMPORTED)
+add_library(BASSAPE SHARED IMPORTED)
+add_library(BASSFLAC SHARED IMPORTED)
+add_library(BASSOPUS SHARED IMPORTED)
+
+if(WIN32)
+set_target_properties(BASS PROPERTIES
+    IMPORTED_LOCATION ${BASS_LIB_DIR}/bass.dll
+    IMPORTED_IMPLIB ${BASS_LIB_DIR}/bass.lib
+)
+
+set_target_properties(BASSALAC PROPERTIES
+    IMPORTED_LOCATION ${BASS_LIB_DIR}/bassalac.dll
+    IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassalac.lib
+)
+
+set_target_properties(BASSAPE PROPERTIES
+    IMPORTED_LOCATION ${BASS_LIB_DIR}/bassape.dll
+    IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassape.lib
+)
+
+set_target_properties(BASSFLAC PROPERTIES
+    IMPORTED_LOCATION ${BASS_LIB_DIR}/bassflac.dll
+    IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassflac.lib
+)
+
+set_target_properties(BASSOPUS PROPERTIES
+    IMPORTED_LOCATION ${BASS_LIB_DIR}/bassopus.dll
+    IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassopus.lib
+)
+endif(WIN32)
+
+if(UNIX)
+    set_target_properties(BASS PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbass.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbass.so
+    )
+
+    set_target_properties(BASSALAC PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassalac.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassalac.so
+    )
+
+    set_target_properties(BASSAPE PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassape.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassape.so
+    )
+
+    set_target_properties(BASSFLAC PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassflac.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassflac.so
+    )
+
+    set_target_properties(BASSOPUS PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassopus.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassopus.so
+    )
+endif(UNIX)
+
+set(BASS_TARGETS
+    BASS;
+    BASSALAC;
+    BASSAPE;
+    BASSFLAC;
+    BASSOPUS;
+)
+
+target_link_libraries(appVekAmp PUBLIC
+    ${BASS_TARGETS}
+    TagLib::tag
+)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+set_target_properties(appVekAmp PROPERTIES
+#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appVekAmp
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+target_link_libraries(appVekAmp
+    PRIVATE Qt6::Quick
+)
+target_link_libraries(appVekAmp PRIVATE Qt6::Core)
+
+include(GNUInstallDirs)
+install(TARGETS appVekAmp
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)

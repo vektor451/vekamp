@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/wordmark.svg</file>
+        <file>Resources/appicon.ico</file>
+        <file>Resources/emptycover.png</file>
+        <file>Resources/controlIcons/next.svg</file>
+        <file>Resources/controlIcons/pause.svg</file>
+        <file>Resources/controlIcons/prev.svg</file>
+        <file>Resources/controlIcons/play.svg</file>
+        <file>Resources/controlIcons/repeat.svg</file>
+        <file>Resources/controlIcons/noRepeat.svg</file>
+        <file>Resources/controlIcons/repeatOne.svg</file>
+        <file>Resources/controlIcons/shuffle.svg</file>
+        <file>Resources/controlIcons/noShuffle.svg</file>
+        <file>Resources/controlIcons/speaker.svg</file>
+        <file>Resources/interFont/Inter_18pt-Italic.ttf</file>
+        <file>Resources/interFont/Inter_18pt-Medium.ttf</file>
+        <file>Resources/interFont/Inter_18pt-MediumItalic.ttf</file>
+        <file>Resources/interFont/Inter_18pt-Regular.ttf</file>
+    </qresource>
+</RCC>
