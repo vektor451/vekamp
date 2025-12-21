@@ -45,6 +45,7 @@ Window {
             drag.accept(Qt.LinkAction)
         }
         onDropped: {
+            bassUI.qMultifileSelect(drop.urls)
             bassUI.qFileSelect(drop.urls[0])
         }
     }
@@ -489,11 +490,17 @@ Window {
                         }
                     }
 
-                    VectorImage{
-                        source: "/Resources/controlIcons/speaker.svg"
-                        height: 16
-                        width: 16
-                        preferredRendererType: VectorImage.CurveRenderer
+                    Button{
+                        icon.source: "/Resources/controlIcons/speaker.svg"
+                        icon.width: 16
+                        icon.height: 16
+                        height: 32
+                        Layout.preferredHeight: 24
+                        width: 32
+                        Layout.preferredWidth: 24
+                        flat: true
+
+                        //TODO: Implement muting functionality. I'm making this a button cause it themes easily.
                     }
 
                     Slider{

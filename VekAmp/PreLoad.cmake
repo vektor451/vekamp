@@ -1,3 +1,3 @@
-#if(WIN32)
+if(WIN32)
 	set (CMAKE_GENERATOR "Visual Studio 18 2026" CACHE INTERNAL "" FORCE)
-#endif
+endif (WIN32)

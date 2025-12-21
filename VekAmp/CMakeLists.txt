@@ -6,20 +6,28 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTORCC ON)
 
+find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
 
-set(TAGLIB_PATH C:/taglib)
-set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
 
-set(CMAKE_PREFIX_PATH C:/taglib)
+if(WIN32)
+    set(TAGLIB_PATH C:/taglib)
+    set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
+    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
+endif(WIN32)
+if(UNIX)
+    set(TAGLIB_PATH ~/taglib)
+    set(TAGLIB_INCLUDE_PATH ~/taglib/include/taglib)
+    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
+endif(UNIX)
+
 find_package(TagLib 2.1.1 REQUIRED)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Resources/appicon.rc")
+if(WIN32)
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/Resources/appicon.rc")
+endif (WIN32)
 
 qt_add_executable(appVekAmp
     main.cpp
@@ -54,7 +62,7 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND} -U BUILD_TIME ${CMAKE_BINARY_DIR}
 )
 
-add_dependencies(clear_cache)
+add_dependencies(appVekAmp clear_cache)
 
 target_compile_definitions(appVekAmp PRIVATE
     VEKAMP_NAME="${CMAKE_PROJECT_NAME}"
@@ -71,34 +79,64 @@ target_include_directories(appVekAmp PUBLIC
 )
 
 add_library(BASS SHARED IMPORTED)
+add_library(BASSALAC SHARED IMPORTED)
+add_library(BASSAPE SHARED IMPORTED)
+add_library(BASSFLAC SHARED IMPORTED)
+add_library(BASSOPUS SHARED IMPORTED)
+
+if(WIN32)
 set_target_properties(BASS PROPERTIES
     IMPORTED_LOCATION ${BASS_LIB_DIR}/bass.dll
     IMPORTED_IMPLIB ${BASS_LIB_DIR}/bass.lib
 )
 
-add_library(BASSALAC SHARED IMPORTED)
 set_target_properties(BASSALAC PROPERTIES
     IMPORTED_LOCATION ${BASS_LIB_DIR}/bassalac.dll
     IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassalac.lib
 )
 
-add_library(BASSAPE SHARED IMPORTED)
 set_target_properties(BASSAPE PROPERTIES
     IMPORTED_LOCATION ${BASS_LIB_DIR}/bassape.dll
     IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassape.lib
 )
 
-add_library(BASSFLAC SHARED IMPORTED)
 set_target_properties(BASSFLAC PROPERTIES
     IMPORTED_LOCATION ${BASS_LIB_DIR}/bassflac.dll
     IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassflac.lib
 )
 
-add_library(BASSOPUS SHARED IMPORTED)
 set_target_properties(BASSOPUS PROPERTIES
     IMPORTED_LOCATION ${BASS_LIB_DIR}/bassopus.dll
     IMPORTED_IMPLIB ${BASS_LIB_DIR}/bassopus.lib
 )
+endif(WIN32)
+
+if(UNIX)
+    set_target_properties(BASS PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbass.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbass.so
+    )
+
+    set_target_properties(BASSALAC PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassalac.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassalac.so
+    )
+
+    set_target_properties(BASSAPE PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassape.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassape.so
+    )
+
+    set_target_properties(BASSFLAC PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassflac.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassflac.so
+    )
+
+    set_target_properties(BASSOPUS PROPERTIES
+        IMPORTED_LOCATION ${BASS_LIB_DIR}/libbassopus.so
+        IMPORTED_IMPLIB ${BASS_LIB_DIR}/libbassopus.so
+    )
+endif(UNIX)
 
 set(BASS_TARGETS
     BASS;

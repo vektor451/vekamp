@@ -32,16 +32,25 @@ std::wstring coverFileNames[] = {
 
 std::wstring GetCoverFilePath(const char fPath[])
 {
-    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
-    std::wstring fNameBufStr;
-    fNameBufStr.resize(fNameLength);
-    MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBufStr.data(), fNameLength);
+#if _WIN32
+        size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
+        std::wstring fNameBufStr;
+        fNameBufStr.resize(fNameLength);
+        MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBufStr.data(), fNameLength);
+        const WCHAR *fNameBuf = fNameBufStr.c_str();
+#else
+        const char *fNameBuf = fPath;
+#endif
 
     qDebug() << "begin";
     //auto foo = std::filesystem::path(fNameBufStr);
     qDebug() << "2";
 
+#if _WIN32
     std::wstring fileDir = std::filesystem::path(fNameBufStr).remove_filename().wstring();
+#else
+    std::string fileDir = std::filesystem::path(fNameBuf).remove_filename();
+#endif
 
     for (const auto& file : std::filesystem::directory_iterator(fileDir))
     {

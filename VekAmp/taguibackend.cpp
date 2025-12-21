@@ -32,7 +32,9 @@ QString TagUIBackend::qGetCurTrackName()
     if(!artist.isEmpty())
     {
         finalString += "**";
-        finalString += artist.toCWString();
+
+        finalString += artist.toCString(true);
+
         finalString += "** - ";
     }
 
@@ -44,7 +46,7 @@ QString TagUIBackend::qGetCurTrackName()
     }
     else
     {
-        finalString += title.toCWString();
+        finalString += title.toCString(true);
     }
 
     return finalString;
@@ -175,13 +177,13 @@ TagLib::FileRef TagUIBackend::GetCurTrackFileRef()
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
 #if _WIN32
-    size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
+    size_t fNameLength = MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
     std::wstring fNameBufStr;
     fNameBufStr.resize(fNameLength);
     MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
     const WCHAR *fNameBuf = fNameBufStr.c_str();
 #else
-    const char *fNameBuf = fPath;
+    const char *fNameBuf = curFilePath;
 #endif
 
     TagLib::FileRef file(fNameBuf);
