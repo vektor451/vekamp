@@ -1,4 +1,5 @@
 #include "bassplayer.hpp"
+#include "librarydb.hpp"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -38,6 +39,9 @@ int main(int argc, char *argv[])
 
     // Bass Init
     BASS::BASSPlayer::Init();
+
+    // SQLite Init
+    LibraryDB::InitLibrary();
 
     if(args.count())
     {

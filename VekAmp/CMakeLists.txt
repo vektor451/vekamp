@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(VekAmp VERSION 0.1.0 LANGUAGES CXX)
+project(VekAmp VERSION 0.2.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,13 +13,13 @@ find_package(Qt6 REQUIRED COMPONENTS Quick)
 if(WIN32)
     set(TAGLIB_PATH C:/taglib)
     set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
-    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
 endif(WIN32)
 if(UNIX)
     set(TAGLIB_PATH ~/taglib)
     set(TAGLIB_INCLUDE_PATH ~/taglib/include/taglib)
-    set(CMAKE_PREFIX_PATH TAGLIB_PATH)
 endif(UNIX)
+
+set(CMAKE_PREFIX_PATH TAGLIB_PATH)
 
 find_package(TagLib 2.1.1 REQUIRED)
 
@@ -33,6 +33,8 @@ qt_add_executable(appVekAmp
     main.cpp
     bassplayer.cpp
     utils.cpp
+    librarydb.cpp
+    Dependencies/SQLite/sqlite3.c
 
     ${app_icon_resource_windows}
 )
@@ -76,7 +78,9 @@ set(BASS_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS/Lib)
 target_include_directories(appVekAmp PUBLIC
     ${BASS_DIR}
     ${TAGLIB_INCLUDE_PATH}
+    Dependencies/SQLite
 )
+
 
 add_library(BASS SHARED IMPORTED)
 add_library(BASSALAC SHARED IMPORTED)
