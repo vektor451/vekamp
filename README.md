@@ -11,19 +11,7 @@ The main motivation for this project is to replace my currently used music playe
 >This project is still in it's infancy, If there are any suggestions or feedback you would like to provide, please [submit an issue](https://github.com/vektor451/vekamp/issues/new).
 
 ## Current Plans
-The plans for the current stage of development are as follows: 
-- [x] Basic media playback functionalities. (Play/Pause, Duration/Position, Volume)
-- [x] Track Queue.
-- [x] More playback functionalities. (Previous, Next, Loop Mode)
-- [x] Read metadata.
-- [x] Extract album art and display it.
-- [ ] Proper port to Linux.
-
-Abandoned plans: 
-- Reading Playlists (I'll probably add M3U support later, but the standard is so... non-standardized that it's too much to bother with for now)
-
-## Platforms
-This branch has only been tested on windows.
-
-## Building
-Building on windows is currently done via QtCreator 18 with Qt 6.10.0, using MSBuild and MSVC from Visual Studio 2026. Other versions of Qt and VS might work, but this is the version that has been currently tested.  
+- [ ] Index music library via SQLite.
+- [ ] Store compressed thumbnail images for albums/tracks.
+- [ ] Display music library in GUI.
+- [ ] Fetch metadata first from library database instead of directly reading tag data.
