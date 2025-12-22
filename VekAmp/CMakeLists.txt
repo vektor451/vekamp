@@ -43,6 +43,7 @@ qt_add_qml_module(appVekAmp
     URI VekAmp
     QML_FILES
         Main.qml
+        MiscPrompts.qml
     SOURCES
         bassuibackend.hpp
         bassuibackend.cpp
