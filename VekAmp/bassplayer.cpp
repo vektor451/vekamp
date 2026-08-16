@@ -149,7 +149,7 @@ namespace BASS
 
     // BASSPlayer Class.
     float       BASSPlayer::volume 			= 1.0;
-    int         	BASSPlayer::deviceIdx 		= -1; // -1 = Default Device.
+    int         BASSPlayer::deviceIdx 		= -1; // -1 = Default Device.
     DWORD   	BASSPlayer::curChannel 		= -1;
     DWORD       BASSPlayer::queuedChannel{};
     QWORD   	BASSPlayer::trackLen 		= -1;
@@ -157,7 +157,7 @@ namespace BASS
     std::string BASSPlayer::curFilePath 	= "";
     bool        BASSPlayer::restartChannel 	= FALSE;
     bool        BASSPlayer::isPlaying 		= FALSE;
-    bool        	BASSPlayer::shuffleMode 	= FALSE;
+    bool        BASSPlayer::shuffleMode 	= FALSE;
     bool        BASSPlayer::isScrolling 	= TRUE;
     int         BASSPlayer::trackQueueIdx = 0;
 

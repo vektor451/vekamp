@@ -9,17 +9,17 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
-
 if(WIN32)
     set(TAGLIB_PATH C:/taglib)
     set(TAGLIB_INCLUDE_PATH C:/taglib/include/taglib)
-endif(WIN32)
+endif()
 if(UNIX)
     set(TAGLIB_PATH ~/taglib)
     set(TAGLIB_INCLUDE_PATH ~/taglib/include/taglib)
-endif(UNIX)
+endif()
 
 set(CMAKE_PREFIX_PATH TAGLIB_PATH)
+set(CMAKE_MODULE_PATH ${TAGLIB_PATH}/lib/pkgconfig)
 
 find_package(TagLib 2.1.1 REQUIRED)
 
@@ -57,8 +57,6 @@ qt_add_qml_module(appVekAmp
         resources.qrc
         Resources/appicon.rc
 )
-
-string(TIMESTAMP BUILD_TIME "%Y/%m/%d %H:%M:%S" UTC)
 
 add_custom_target(
     clear_cache

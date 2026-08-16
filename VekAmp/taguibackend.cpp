@@ -120,7 +120,7 @@ QString TagUIBackend::qGetTrackDetailStr()
         channelString = std::format("{} channels", channels);
     }
 
-    outString += std::format("<p><font color=grey><small>{}, {} kHz, {}k, {}, {}</font></small>",
+    outString += std::format("<p><font color=grey><small>{} / {} kHz / {}k / {} / {}</font></small>",
                              fileExt, (double)sampleRate / 1000, bitRate, channelString, BASS::BASSPlayer::GetTrackLenStr());
 
     return outString;
