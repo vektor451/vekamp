@@ -113,9 +113,24 @@ qreal BASSUIBackend::qGetVolume()
     return BASS::BASSPlayer::GetVolume();
 }
 
+int BASSUIBackend::qGetTrackQueueLength()
+{
+    return BASS::BASSPlayer::GetTrackQueueLength();
+}
+
+QString BASSUIBackend::qGetTrackFileNameAtIndex(int idx)
+{
+    return BASS::BASSPlayer::GetTrackFileNameAtIndex(idx);
+}
+
 void BASSUIBackend::EmitTrackChange()
 {
     emit trackChanged();
+}
+
+void BASSUIBackend::EmitNewTrackQueue()
+{
+    emit newTrackQueue();
 }
 
 void BASSUIBackend::EmitErrorMessage(QString message)

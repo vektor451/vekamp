@@ -498,6 +498,8 @@ namespace BASS
         trackQueue = newQueue;
         qDebug() << "New Queue: " << trackQueue;
 
+        backendQObj->EmitNewTrackQueue();
+
         //QueueNextTrack();
     }
 

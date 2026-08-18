@@ -69,6 +69,19 @@ Window {
         onPlayStateChanged: {
             playButton.updatePlayingIcon();
         }
+        onNewTrackQueue: {
+            queueModel.clear();
+
+            for (var i = 0; i < bassUI.qGetTrackQueueLength(); i++)
+            {
+                var fPath = bassUI.qGetTrackFileNameAtIndex(i);
+                var title = tagUI.qGetTrackTitle(fPath);
+                var artist = tagUI.qGetTrackArtist(fPath);
+                var length = tagUI.qGetTrackLength(fPath);
+
+                queueModel.append({trackTitle: title, trackArtist: artist, trackLength: length})
+            }
+        }
     }
 
     MiscUIBackend{
@@ -222,6 +235,13 @@ Window {
                                 spacing: 2
                                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
 
+                                Label{
+                                    text: "**Track Queue**"
+                                    textFormat: Text.MarkdownText
+                                    lineHeight: 1
+                                    font.pointSize: 8
+                                }
+
                                 ScrollView {
                                     id: scrollView1
                                     Layout.fillWidth: true
@@ -239,21 +259,6 @@ Window {
 
                                         model: ListModel{
                                             id: queueModel
-                                            ListElement{
-                                                trackTitle: "The awesome track"
-                                                trackArtist: "The awesome artist"
-                                                trackLength: "4:20"
-                                            }
-                                            ListElement{
-                                                trackTitle: "The even awesomer track"
-                                                trackArtist: "The awesomest artist"
-                                                trackLength: "67:69"
-                                            }
-                                            ListElement{
-                                                trackTitle: "Ugh poopy track"
-                                                trackArtist: "Kid like poop"
-                                                trackLength: "2:10"
-                                            }
                                         }
 
                                         delegate: Frame {

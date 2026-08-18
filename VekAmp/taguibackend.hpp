@@ -12,9 +12,9 @@ class TagUIBackend : public QObject
 public:
     explicit TagUIBackend(QObject *parent = nullptr);
     Q_INVOKABLE QString qGetCurTrackName();
-    Q_INVOKABLE QString qGetTrackTitle(const char *filePath);
-    Q_INVOKABLE QString qGetTrackArtist(const char *filePath, bool returnUnknown = false);
-    Q_INVOKABLE QString qGetTrackLength(const char *filePath);
+    Q_INVOKABLE QString qGetTrackTitle(QString filePath);
+    Q_INVOKABLE QString qGetTrackArtist(QString filePath, bool returnUnknown = false);
+    Q_INVOKABLE QString qGetTrackLength(QString filePath);
     Q_INVOKABLE QString qGetTrackDetailStr();
     Q_INVOKABLE void qUpdateAlbumCover();
 

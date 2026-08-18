@@ -29,13 +29,18 @@ public:
     Q_INVOKABLE void qSetVolume(qreal value);
     Q_INVOKABLE qreal qGetVolume();
 
+    Q_INVOKABLE int qGetTrackQueueLength();
+    Q_INVOKABLE QString qGetTrackFileNameAtIndex(int idx);
+
     void EmitTrackChange();
     void EmitErrorMessage(QString message);
     void EmitPlayStateChanged();
+    void EmitNewTrackQueue();
 
 signals:
     void trackChanged();
     void playStateChanged();
+    void newTrackQueue();
     void bassError(QString message);
 };
 

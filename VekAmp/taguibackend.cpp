@@ -42,9 +42,10 @@ QString TagUIBackend::qGetCurTrackName()
     return finalString;
 }
 
-QString TagUIBackend::qGetTrackTitle(const char *filePath)
+QString TagUIBackend::qGetTrackTitle(QString filePath)
 {
-    TagLib::FileRef file = GetTrackFileRef(filePath);
+    std::string stdFilePath = filePath.toStdString();
+    TagLib::FileRef file = GetTrackFileRef(stdFilePath.c_str());
     TagLib::String title = file.tag()->title();
 
     QString outString = "";
@@ -52,7 +53,7 @@ QString TagUIBackend::qGetTrackTitle(const char *filePath)
     if (title.isEmpty())
     {
         // Track name based on filename. This should be executed if there is no track metadata to go off.
-        std::string fileString = std::filesystem::path(filePath).stem().string();
+        std::string fileString = std::filesystem::path(stdFilePath.c_str()).stem().string();
         outString += fileString;
     }
     else
@@ -63,9 +64,10 @@ QString TagUIBackend::qGetTrackTitle(const char *filePath)
     return outString;
 }
 
-QString TagUIBackend::qGetTrackArtist(const char *filePath, bool returnUnknown)
+QString TagUIBackend::qGetTrackArtist(QString filePath, bool returnUnknown)
 {
-    TagLib::FileRef file = GetTrackFileRef(filePath);
+    std::string stdFilePath = filePath.toStdString();
+    TagLib::FileRef file = GetTrackFileRef(stdFilePath.c_str());
     TagLib::String artist = file.tag()->artist();
 
     QString outString = "";
@@ -82,16 +84,17 @@ QString TagUIBackend::qGetTrackArtist(const char *filePath, bool returnUnknown)
     return outString;
 }
 
-QString TagUIBackend::qGetTrackLength(const char *filePath)
+QString TagUIBackend::qGetTrackLength(QString filePath)
 {
-    TagLib::FileRef file = GetTrackFileRef(filePath);
+    std::string stdFilePath = filePath.toStdString();
+    TagLib::FileRef file = GetTrackFileRef(stdFilePath.c_str());
     TagLib::offset_t length = file.audioProperties()->lengthInSeconds();
 
     int mins = (int)(length / 60.0);
     int secs = (int)length % 60;
 
     QString outString = "%1:%2";
-    outString = outString.arg(mins).arg(secs);
+    outString = outString.arg(mins).arg(secs, 2, 10, QLatin1Char('0'));
 
     return outString;
 }
