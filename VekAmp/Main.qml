@@ -212,21 +212,107 @@ Window {
                             anchors.fill: parent
                             Layout.preferredHeight: 65535
                             Layout.fillHeight: true
-                            width: 256
                             Layout.preferredWidth: 256
                             Layout.alignment: Qt.AlignRight | Qt.AlignTop
                             spacing: 4
                             layoutDirection: Qt.LeftToRight
                             Layout.fillWidth: false
 
-                            ColumnLayout{
+                            ColumnLayout {
                                 spacing: 2
                                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+
+                                ScrollView {
+                                    id: scrollView1
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    Layout.useDefaultSizePolicy: Layout.SizePolicyImplicit
+
+                                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                                    clip: true
+
+                                    ListView {
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        spacing: 2
+                                        clip: true
+
+                                        model: ListModel{
+                                            ListElement{
+                                                trackTitle: "The awesome track"
+                                                trackArtist: "The awesome artist"
+                                                trackLength: "4:20"
+                                            }
+                                            ListElement{
+                                                trackTitle: "The even awesomer track"
+                                                trackArtist: "The awesomest artist"
+                                                trackLength: "67:69"
+                                            }
+                                            ListElement{
+                                                trackTitle: "Ugh poopy track"
+                                                trackArtist: "Kid like poop"
+                                                trackLength: "2:10"
+                                            }
+                                        }
+
+                                        delegate: Frame {
+                                            required property string trackTitle
+                                            required property string trackArtist
+                                            required property string trackLength
+
+                                            anchors.left: parent.left
+                                            anchors.right: parent.right
+                                            anchors.leftMargin: 0
+                                            anchors.rightMargin: 12
+                                            transformOrigin: Item.Center
+                                            padding: 2
+                                            RowLayout {
+                                                anchors.fill: parent
+                                                Layout.fillWidth: true
+                                                spacing: 4
+                                                Image {
+                                                    //id: queueImage
+                                                    source: "/Resources/emptycover.png"
+                                                    verticalAlignment: Image.AlignVCenter
+                                                    //width: 32
+                                                    //height: 32
+                                                    sourceSize.width: 32
+                                                    sourceSize.height: 32
+                                                    fillMode: Image.PreserveAspectFit
+                                                    cache: false;
+                                                    Layout.fillHeight: true
+                                                    Layout.fillWidth: false
+                                                }
+                                                Label {
+                                                    Layout.fillWidth: true
+                                                    //id: queueTrackDetailLabel
+                                                    textFormat: Text.RichText
+                                                    text: qsTr("<style type=\"text/css\">p { margin-top: 4px; margin-bottom: 4px; }</style><p>%1<p><p><font color=grey><small>%2</font></small></p>".arg(trackTitle).arg(trackArtist))
+                                                    lineHeight: 1
+                                                    font.pointSize: 8
+                                                    wrapMode: Text.NoWrap
+                                                }
+                                                Label {
+                                                    Layout.fillWidth: false
+                                                    textFormat: Text.RichText
+                                                    text: trackLength
+                                                    lineHeight: 1
+                                                    font.pointSize: 8
+                                                    width: parent.width;
+                                                    wrapMode: Text.NoWrap
+                                                    Layout.alignment: Qt.AlignRight
+                                                    rightPadding: 2
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+
                                 Frame{
                                     padding: 4
                                     horizontalPadding: 4
                                     Layout.fillWidth: true
-                                    Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                                     Layout.fillHeight: false
 
                                     Label {
@@ -459,15 +545,15 @@ Window {
                         onClicked: {
                             let repeatNum = bassUI.qToggleRepeatMode();
                             switch (repeatNum) {
-                                case 0:
-                                    icon.source = "/Resources/controlIcons/noRepeat.svg"
-                                    break;
-                                case 1:
-                                    icon.source = "/Resources/controlIcons/repeat.svg"
-                                    break;
-                                case 2:
-                                    icon.source = "/Resources/controlIcons/repeatOne.svg"
-                                    break;
+                            case 0:
+                                icon.source = "/Resources/controlIcons/noRepeat.svg"
+                                break;
+                            case 1:
+                                icon.source = "/Resources/controlIcons/repeat.svg"
+                                break;
+                            case 2:
+                                icon.source = "/Resources/controlIcons/repeatOne.svg"
+                                break;
                             }
                         }
                     }
@@ -504,6 +590,6 @@ Window {
 
 /*##^##
 Designer {
-    D{i:0}D{i:3;invisible:true}
+    D{i:0}D{i:3;invisible:true}D{i:33}
 }
 ##^##*/
