@@ -87,6 +87,8 @@ namespace BASS
             static RepeatMode GetRepeatMode();
             static bool GetShuffleMode();
             static void ToggleShuffleMode();
+            static int GetTrackQueueLength();
+            static const char *GetTrackFileNameAtIndex(int idx);
         
         private:
             // Varibales

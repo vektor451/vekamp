@@ -214,7 +214,7 @@ namespace BASS
 #else
         const char *fNameBuf = fPath;
 #endif
-        // These formats should be definite.
+        // These formats should be definitive.
         if(format == AudioFormat::FLAC)
             *channel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);
         else if(format == AudioFormat::ALAC)
@@ -645,15 +645,18 @@ namespace BASS
     }
 
 	// One liner Setters/Getters
-    float       BASSPlayer::GetVolume() 		{return volume;}
-	QWORD       BASSPlayer::GetTrackLen() 		{return trackLen;}
-	double      BASSPlayer::GetTrackLenSecs()	{return BASS_ChannelBytes2Seconds(curChannel, trackLen);}
-    const char *BASSPlayer::GetTrackLenStr() 	{return trackLenStr.c_str();}
-    const char *BASSPlayer::GetCurFilePath() 	{return curFilePath.c_str();}
-    bool        BASSPlayer::IsPlaying()			{return isPlaying;}
-    bool        BASSPlayer::GetShuffleMode()	{return shuffleMode;}
-    bool        BASSPlayer::IsScrolling()       {return isScrolling;}
-    int         BASSPlayer::GetTrackQueueIdx()  {return trackQueueIdx;}
+    float       BASSPlayer::GetVolume()             {return volume;}
+    QWORD       BASSPlayer::GetTrackLen()           {return trackLen;}
+    double      BASSPlayer::GetTrackLenSecs()       {return BASS_ChannelBytes2Seconds(curChannel, trackLen);}
+    const char *BASSPlayer::GetTrackLenStr()        {return trackLenStr.c_str();}
+    const char *BASSPlayer::GetCurFilePath()        {return curFilePath.c_str();}
+    bool        BASSPlayer::IsPlaying()             {return isPlaying;}
+    bool        BASSPlayer::GetShuffleMode()        {return shuffleMode;}
+    bool        BASSPlayer::IsScrolling()           {return isScrolling;}
+    int         BASSPlayer::GetTrackQueueIdx()      {return trackQueueIdx;}
+    int         BASSPlayer::GetTrackQueueLength()   {return trackQueue.size();}
+
+    const char *BASSPlayer::GetTrackFileNameAtIndex(int idx) {return trackQueue[idx].c_str();}
 
     BASSPlayer::RepeatMode BASSPlayer::GetRepeatMode() {return repeatMode;}
 

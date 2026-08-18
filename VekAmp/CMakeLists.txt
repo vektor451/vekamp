@@ -51,7 +51,7 @@ qt_add_qml_module(appVekAmp
         miscuibackend.cpp
         coverimageprovider.hpp
         coverimageprovider.cpp
-        taguibackend.h
+        taguibackend.hpp
         taguibackend.cpp
     RESOURCES
         resources.qrc

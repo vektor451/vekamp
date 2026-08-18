@@ -238,6 +238,7 @@ Window {
                                         clip: true
 
                                         model: ListModel{
+                                            id: queueModel
                                             ListElement{
                                                 trackTitle: "The awesome track"
                                                 trackArtist: "The awesome artist"

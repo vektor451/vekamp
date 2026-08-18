@@ -1,4 +1,4 @@
-#include "taguibackend.h"
+#include "taguibackend.hpp"
 #include "tag.h"
 #include "fileref.h"
 #include "flacpicture.h"
@@ -23,9 +23,8 @@ QString TagUIBackend::qGetCurTrackName()
 {
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-    TagLib::FileRef file = GetCurTrackFileRef();
-    TagLib::String title = file.tag()->title();
-    TagLib::String artist = file.tag()->artist();
+    QString title = qGetTrackTitle(curFilePath);
+    QString artist = qGetTrackArtist(curFilePath);
 
     QString finalString = "";
 
@@ -33,30 +32,75 @@ QString TagUIBackend::qGetCurTrackName()
     {
         finalString += "**";
 
-        finalString += artist.toCString(true);
+        finalString += artist;
 
         finalString += "** - ";
     }
 
+    finalString += title;
+
+    return finalString;
+}
+
+QString TagUIBackend::qGetTrackTitle(const char *filePath)
+{
+    TagLib::FileRef file = GetTrackFileRef(filePath);
+    TagLib::String title = file.tag()->title();
+
+    QString outString = "";
+
     if (title.isEmpty())
     {
         // Track name based on filename. This should be executed if there is no track metadata to go off.
-        std::string fileString = std::filesystem::path(curFilePath).stem().string();
-        finalString += fileString;
+        std::string fileString = std::filesystem::path(filePath).stem().string();
+        outString += fileString;
     }
     else
     {
-        finalString += title.toCString(true);
+        outString += title.toCString(true);
     }
 
-    return finalString;
+    return outString;
+}
+
+QString TagUIBackend::qGetTrackArtist(const char *filePath, bool returnUnknown)
+{
+    TagLib::FileRef file = GetTrackFileRef(filePath);
+    TagLib::String artist = file.tag()->artist();
+
+    QString outString = "";
+
+    if (artist.isEmpty())
+    {
+        if (returnUnknown) outString += "Unknown Artist";
+    }
+    else
+    {
+        outString += artist.toCString(true);
+    }
+
+    return outString;
+}
+
+QString TagUIBackend::qGetTrackLength(const char *filePath)
+{
+    TagLib::FileRef file = GetTrackFileRef(filePath);
+    TagLib::offset_t length = file.audioProperties()->lengthInSeconds();
+
+    int mins = (int)(length / 60.0);
+    int secs = (int)length % 60;
+
+    QString outString = "%1:%2";
+    outString = outString.arg(mins).arg(secs);
+
+    return outString;
 }
 
 QString TagUIBackend::qGetTrackDetailStr()
 {
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-    TagLib::FileRef file = GetCurTrackFileRef();
+    TagLib::FileRef file = GetTrackFileRef(curFilePath);
 
     TagLib::String title = file.tag()->title();
     TagLib::String artist = file.tag()->artist();
@@ -131,7 +175,7 @@ void TagUIBackend::qUpdateAlbumCover()
 {
     const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
-    TagLib::FileRef file = GetCurTrackFileRef();
+    TagLib::FileRef file = GetTrackFileRef(curFilePath);
 
     std::wstring coverfPath = GetCoverFilePath(curFilePath);
     QString qcoverfPath = QString::fromStdWString(coverfPath);
@@ -172,15 +216,14 @@ void TagUIBackend::qUpdateAlbumCover()
     emit updateImage();
 }
 
-TagLib::FileRef TagUIBackend::GetCurTrackFileRef()
+TagLib::FileRef TagUIBackend::GetTrackFileRef(const char *filePath)
 {
-    const char *curFilePath = BASS::BASSPlayer::GetCurFilePath();
 
 #if _WIN32
-    size_t fNameLength = MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, NULL, 0);
+    size_t fNameLength = MultiByteToWideChar(CP_UTF8, 0, filePath, -1, NULL, 0);
     std::wstring fNameBufStr;
     fNameBufStr.resize(fNameLength);
-    MultiByteToWideChar(CP_UTF8, 0, curFilePath, -1, fNameBufStr.data(), fNameLength);
+    MultiByteToWideChar(CP_UTF8, 0, filePath, -1, fNameBufStr.data(), fNameLength);
     const WCHAR *fNameBuf = fNameBufStr.c_str();
 #else
     const char *fNameBuf = curFilePath;
