@@ -53,9 +53,9 @@ Item{
         id: aboutDialog
         title: qsTr("About VekAmp")
         maximumWidth: 384
-        maximumHeight: 200
+        maximumHeight: 180
         minimumWidth: 384
-        minimumHeight: 200
+        minimumHeight: 180
         flags: Qt.Dialog
 
         Pane{

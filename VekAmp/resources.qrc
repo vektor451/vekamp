@@ -17,5 +17,8 @@
         <file>Resources/interFont/Inter_18pt-Medium.ttf</file>
         <file>Resources/interFont/Inter_18pt-MediumItalic.ttf</file>
         <file>Resources/interFont/Inter_18pt-Regular.ttf</file>
+        <file>Sources/QML/TrackQueue.qml</file>
+        <file>Sources/QML/TrackMetaView.qml</file>
+        <file>Sources/QML/PlayerBar.qml</file>
     </qresource>
 </RCC>

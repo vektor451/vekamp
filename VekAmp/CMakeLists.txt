@@ -43,6 +43,9 @@ qt_add_qml_module(appVekAmp
     URI VekAmp
     QML_FILES
         Sources/QML/Main.qml
+        Sources/QML/TrackQueue.qml
+        Sources/QML/TrackMetaView.qml
+        Sources/QML/PlayerBar.qml
         Sources/QML/MiscPrompts.qml
     SOURCES
         Sources/CPPBackend/bassuibackend.hpp
