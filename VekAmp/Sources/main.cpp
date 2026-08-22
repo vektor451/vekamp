@@ -11,6 +11,9 @@
 
 int main(int argc, char *argv[])
 {
+    // Initialise BASSPlayer Singleton
+    BASS::BASSPlayer singleton = BASS::BASSPlayer();
+
     QGuiApplication app(argc, argv);
     app.setApplicationName("VekAmp");
     app.setApplicationVersion(VEKAMP_VER);

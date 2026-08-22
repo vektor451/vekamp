@@ -42,7 +42,9 @@ namespace BASS
             static StreamFormat GetFormat(std::string fPath);
     };
 
-    class BASSPlayer {
+    class BASSPlayer : public QObject {
+        Q_OBJECT
+
         public:
             enum RepeatMode{
                 NoRepeat,
@@ -51,10 +53,8 @@ namespace BASS
                 Count,
             };
 
-            // Variables
-            static BASSUIBackend * backendQObj;
-
             // Functions
+            explicit BASSPlayer(QObject *parent = nullptr);
             static void Init();
             static void Destroy();
             static bool CreateChannelStream(const char fPath[], DWORD *channel);
@@ -89,6 +89,7 @@ namespace BASS
             static void ToggleShuffleMode();
             static int GetTrackQueueLength();
             static const char *GetTrackFileNameAtIndex(int idx);
+            static BASSPlayer *GetSingletonInstance();
         
         private:
             // Varibales
@@ -112,8 +113,16 @@ namespace BASS
 
             static std::thread queueThread;
 
+            static BASSPlayer *singletonInstance;
+
             // Functions
             static void QueueNextTrack();
             static void CALLBACK TrackFinishedProcess(HSYNC handle, DWORD channel, DWORD data, void *user);
+
+        signals:
+            void playStateChanged();
+            void trackChanged();
+            void newTrackQueue();
+            void bassError(QString message);
     };
 }

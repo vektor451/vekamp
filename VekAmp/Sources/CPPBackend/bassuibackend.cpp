@@ -4,12 +4,25 @@
 BASSUIBackend::BASSUIBackend(QObject *parent)
     : QObject{parent}
 {
-    // HACK: assigning like this is a bit hacky, but it works.
-    if(BASS::BASSPlayer::backendQObj)
-    {
-        qDebug("Multiple BASSUIBackends created: BASSPlayer already has a backendQObj set. Overriding existing backendQObj.");
-    }
-    BASS::BASSPlayer::backendQObj = this;
+    QObject::connect(
+        BASS::BASSPlayer::GetSingletonInstance(), &BASS::BASSPlayer::trackChanged,
+        this, &BASSUIBackend::EmitTrackChange
+    );
+
+    QObject::connect(
+        BASS::BASSPlayer::GetSingletonInstance(), &BASS::BASSPlayer::bassError,
+        this, &BASSUIBackend::EmitErrorMessage
+    );
+
+    QObject::connect(
+        BASS::BASSPlayer::GetSingletonInstance(), &BASS::BASSPlayer::playStateChanged,
+        this, &BASSUIBackend::EmitPlayStateChanged
+    );
+
+    QObject::connect(
+        BASS::BASSPlayer::GetSingletonInstance(), &BASS::BASSPlayer::newTrackQueue,
+        this, &BASSUIBackend::EmitNewTrackQueue
+    );
 }
 
 void BASSUIBackend::qFileSelect(QUrl fPath)

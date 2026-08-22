@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE int qGetTrackQueueLength();
     Q_INVOKABLE QString qGetTrackFileNameAtIndex(int idx);
 
+public slots:
     void EmitTrackChange();
     void EmitErrorMessage(QString message);
     void EmitPlayStateChanged();

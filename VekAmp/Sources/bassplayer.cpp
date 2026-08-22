@@ -2,7 +2,7 @@
 #include "bassplayer.hpp"
 
 #include <iterator>
-#include <filesystem>
+//#include <filesystem>
 #include <string>
 #include <algorithm>
 #include <string>
@@ -102,13 +102,13 @@ namespace BASS
             exit(0);
         }
 
-        if(showGUI && BASS::BASSPlayer::backendQObj)
+        if(showGUI)
         {
             QString str = "**A BASS Error has occured:** ";
             str += GetErrorStr(BASS_ErrorGetCode());
             str += "\n\n";
             str += text;
-            BASS::BASSPlayer::backendQObj->EmitErrorMessage(str);
+            emit BASSPlayer::GetSingletonInstance()->playStateChanged();
         }
     }
 
@@ -160,14 +160,22 @@ namespace BASS
     bool        BASSPlayer::shuffleMode 	= FALSE;
     bool        BASSPlayer::isScrolling 	= TRUE;
     int         BASSPlayer::trackQueueIdx = 0;
+    BASSPlayer *BASSPlayer::singletonInstance = nullptr;
 
     BASSPlayer::RepeatMode BASSPlayer::repeatMode{};
 
     std::vector<std::string>    BASSPlayer::trackQueue{};
     std::vector<int>            BASSPlayer::trackHistory{};
 
-
-    BASSUIBackend * BASSPlayer::backendQObj = nullptr;
+    BASSPlayer::BASSPlayer(QObject *parent)
+        : QObject{parent}
+    {
+        if(singletonInstance != nullptr)
+        {
+            throw std::logic_error("Singleton objects should only be created once.");
+        }
+        singletonInstance = this;
+    }
 
     void BASSPlayer::Init()
     {
@@ -329,14 +337,7 @@ namespace BASS
 			trackLenStr = "0:00";
 		}
 
-        if(backendQObj)
-        {
-            backendQObj->EmitTrackChange();
-        }
-        else
-        {
-            qDebug("backendQObj is a nullptr! Cannot emit signals.");
-        }
+        emit GetSingletonInstance()->trackChanged();
 
 		isPlaying = false;
 
@@ -383,8 +384,7 @@ namespace BASS
 			isPlaying = false;
         }
 
-        if(backendQObj)
-            backendQObj->EmitPlayStateChanged();
+        emit GetSingletonInstance()->playStateChanged();
     }
 
     void BASSPlayer::StopPlayback()
@@ -498,7 +498,7 @@ namespace BASS
         trackQueue = newQueue;
         qDebug() << "New Queue: " << trackQueue;
 
-        backendQObj->EmitNewTrackQueue();
+        emit GetSingletonInstance()->newTrackQueue();
 
         //QueueNextTrack();
     }
@@ -644,6 +644,15 @@ namespace BASS
             return trackQueue.size() - 1;
         else
             return trackQueueIdx - 1;
+    }
+
+    BASSPlayer *BASSPlayer::GetSingletonInstance()
+    {
+        if(singletonInstance == nullptr)
+        {
+            throw std::logic_error("Singleton is not initialised.");
+        }
+        return singletonInstance;
     }
 
 	// One liner Setters/Getters
