@@ -18,6 +18,10 @@ Window {
 
     //palette.highlight: "#cc3366" palette only works with ApplicationWindow, which none of the editors support as a root element.
 
+    onActiveFocusItemChanged: {
+        print("focus changed: " + activeFocusItem);
+    }
+
     FontLoader{
         id: interFont;
         source: "/Resources/interFont/Inter_18pt-Regular.ttf"
@@ -240,6 +244,9 @@ Window {
                                     textFormat: Text.MarkdownText
                                     lineHeight: 1
                                     font.pointSize: 8
+                                    topPadding: 1
+                                    leftPadding: 2
+                                    bottomPadding: 1
                                 }
 
                                 ScrollView {
@@ -272,10 +279,18 @@ Window {
                                             anchors.rightMargin: 12
                                             transformOrigin: Item.Center
                                             padding: 2
+
+                                            contentWidth: trackQueueLayout.implicitWidth
+                                            contentHeight: trackQueueLayout.implicitHeight
+
                                             RowLayout {
+                                                id: trackQueueLayout
                                                 anchors.fill: parent
                                                 Layout.fillWidth: true
                                                 spacing: 4
+                                                //parent.width: implicitWidth
+                                                //parent.height: implicitHeight
+
                                                 Image {
                                                     //id: queueImage
                                                     source: "/Resources/emptycover.png"
@@ -289,14 +304,40 @@ Window {
                                                     Layout.fillHeight: true
                                                     Layout.fillWidth: false
                                                 }
-                                                Label {
-                                                    Layout.fillWidth: true
-                                                    //id: queueTrackDetailLabel
-                                                    textFormat: Text.RichText
-                                                    text: qsTr("<style type=\"text/css\">p { margin-top: 4px; margin-bottom: 4px; }</style><p>%1<p><p><font color=grey><small>%2</font></small></p>".arg(trackTitle).arg(trackArtist))
-                                                    lineHeight: 1
-                                                    font.pointSize: 8
-                                                    wrapMode: Text.NoWrap
+                                                ColumnLayout{
+                                                    Layout.fillHeight: false
+                                                    Layout.alignment: Qt.AlignVCenter
+
+                                                    spacing: 2
+
+
+                                                    Label {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: false
+                                                        Layout.alignment: Qt.AlignVCenter
+                                                        //id: queueTrackDetailLabel
+                                                        //textFormat: Text.RichText
+                                                        text: trackTitle
+                                                        lineHeight: 1
+                                                        font.pointSize: 8
+                                                        wrapMode: Text.NoWrap
+                                                        elide: Text.ElideRight
+                                                        //leftPadding: 2
+                                                    }
+                                                    Label {
+                                                        Layout.fillWidth: true
+                                                        Layout.fillHeight: false
+                                                        Layout.alignment: Qt.AlignVCenter
+                                                        //id: queueTrackDetailLabel
+                                                        //textFormat: Text.RichText
+                                                        text: trackArtist
+                                                        lineHeight: 1
+                                                        font.pointSize: 8
+                                                        wrapMode: Text.NoWrap
+                                                        elide: Text.ElideRight
+                                                        color: "grey"
+                                                        //leftPadding: 2
+                                                    }
                                                 }
                                                 Label {
                                                     Layout.fillWidth: false
@@ -307,7 +348,29 @@ Window {
                                                     width: parent.width;
                                                     wrapMode: Text.NoWrap
                                                     Layout.alignment: Qt.AlignRight
-                                                    rightPadding: 2
+                                                    rightPadding: 4
+                                                }
+                                            }
+
+                                            MouseArea {
+                                                id: trackQueueDrag
+                                                acceptedButtons: Qt.LeftButton
+                                                anchors.fill: parent
+
+                                                onClicked: (mouse) => {
+                                                    if (mouse.button === Qt.RightButton)
+                                                    {
+                                                        //trackQueueContextMenu.
+                                                    }
+                                                }
+                                            }
+
+                                            Drag.active: trackQueueDrag.drag.active
+
+                                            ContextMenu.menu: Menu{
+                                                id: trackQueueContextMenu
+                                                MenuItem {
+                                                    text: qsTr("&Play Now")
                                                 }
                                             }
                                         }
