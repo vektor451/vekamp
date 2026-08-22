@@ -30,10 +30,10 @@ if(WIN32)
 endif (WIN32)
 
 qt_add_executable(appVekAmp
-    main.cpp
-    bassplayer.cpp
-    utils.cpp
-    librarydb.cpp
+    Sources/main.cpp
+    Sources/bassplayer.cpp
+    Sources/utils.cpp
+    Sources/librarydb.cpp
     Dependencies/SQLite/sqlite3.c
 
     ${app_icon_resource_windows}
@@ -42,22 +42,21 @@ qt_add_executable(appVekAmp
 qt_add_qml_module(appVekAmp
     URI VekAmp
     QML_FILES
-        Main.qml
-        MiscPrompts.qml
+        Sources/QML/Main.qml
+        Sources/QML/MiscPrompts.qml
     SOURCES
-        bassuibackend.hpp
-        bassuibackend.cpp
-        miscuibackend.hpp
-        miscuibackend.cpp
-        coverimageprovider.hpp
-        coverimageprovider.cpp
-        taguibackend.hpp
-        taguibackend.cpp
+        Sources/CPPBackend/bassuibackend.hpp
+        Sources/CPPBackend/bassuibackend.cpp
+        Sources/CPPBackend/miscuibackend.hpp
+        Sources/CPPBackend/miscuibackend.cpp
+        Sources/CPPBackend/coverimageprovider.hpp
+        Sources/CPPBackend/coverimageprovider.cpp
+        Sources/CPPBackend/taguibackend.hpp
+        Sources/CPPBackend/taguibackend.cpp
     RESOURCES
         resources.qrc
         Resources/appicon.rc
 )
-
 add_custom_target(
     clear_cache
     COMMAND ${CMAKE_COMMAND} -U BUILD_TIME ${CMAKE_BINARY_DIR}
@@ -77,6 +76,8 @@ set(BASS_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/BASS/Lib)
 target_include_directories(appVekAmp PUBLIC
     ${BASS_DIR}
     ${TAGLIB_INCLUDE_PATH}
+    Sources
+    Sources/CPPBackend
     Dependencies/SQLite
 )
 
