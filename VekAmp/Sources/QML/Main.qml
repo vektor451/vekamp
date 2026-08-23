@@ -12,7 +12,7 @@ Window {
     width: 960
     height: 600
     minimumWidth: 640
-    minimumHeight: 400
+    minimumHeight: 480
     visible: true
     title: qsTr("VekAmp")
 
@@ -140,47 +140,21 @@ Window {
             }
 
             Frame {
-                id: frame
-                width: 200
-                height: 200
-                bottomPadding: 0
                 padding: 0
-                leftPadding: 0
-                topPadding: 0
-                contentWidth: 5
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 RowLayout{
                     anchors.fill: parent
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
 
                     Frame {
-                        id: frame1
-                        width: 192
-                        height: 200
                         verticalPadding: 2
-                        topPadding: 2
-                        rightPadding: 2
-                        padding: 2
-                        leftPadding: 2
+                        horizontalPadding: 2
                         Layout.preferredWidth: 192
                         Layout.fillHeight: true
-
-                        ScrollView {
-                            id: scrollView
-                            anchors.fill: parent
-                            Layout.preferredWidth: 192
-                            Layout.fillHeight: true
-                        }
                     }
 
                     Frame {
-                        id: frame2
-                        width: 200
-                        height: 200
-                        padding: 2
                         verticalPadding: 2
                         bottomPadding: 3
                         horizontalPadding: 2
@@ -190,38 +164,27 @@ Window {
 
                         ColumnLayout {
                             anchors.fill: parent
-                            Layout.preferredHeight: 65535
                             Layout.fillHeight: true
-                            Layout.preferredWidth: 256
-                            Layout.alignment: Qt.AlignRight | Qt.AlignTop
-                            spacing: 4
-                            layoutDirection: Qt.LeftToRight
                             Layout.fillWidth: false
+                            spacing: 2
 
-                            ColumnLayout {
-                                spacing: 2
-                                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                            Label{
+                                text: "**Track Queue**"
+                                textFormat: Text.MarkdownText
+                                topPadding: 1
+                                leftPadding: 2
+                                bottomPadding: 1
+                            }
 
-                                Label{
-                                    text: "**Track Queue**"
-                                    textFormat: Text.MarkdownText
-                                    lineHeight: 1
-                                    font.pointSize: 8
-                                    topPadding: 1
-                                    leftPadding: 2
-                                    bottomPadding: 1
-                                }
+                            TrackQueue{
+                                id: trackQueue
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                            }
 
-                                TrackQueue{
-                                    id: trackQueue
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                }
-
-                                TrackMetaView{
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: false
-                                }
+                            TrackMetaView{
+                                Layout.fillWidth: true
+                                Layout.fillHeight: false
                             }
 
                         }
@@ -239,6 +202,6 @@ Window {
 
 /*##^##
 Designer {
-    D{i:0}D{i:3;invisible:true}D{i:33}
+    D{i:0}D{i:3;invisible:true}
 }
 ##^##*/
