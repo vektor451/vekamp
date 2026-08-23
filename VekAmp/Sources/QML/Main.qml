@@ -60,47 +60,10 @@ Window {
 
     BASSUIBackend{
         id: bassUI
-        onTrackChanged: {
-            trackName.text = tagUI.qGetCurTrackName();
-            tagUI.qUpdateAlbumCover();
-            playButton.updatePlayingIcon();
-            trackDetailLabel.text = tagUI.qGetTrackDetailStr();
-        }
-        onBassError: {
-            miscPrompts.bassERROR.show();
-            miscPrompts.bassERRORText.text = message;
-        }
-        onPlayStateChanged: {
-            playButton.updatePlayingIcon();
-        }
-        onNewTrackQueue: {
-            trackQueue.listModel.clear();
-
-            for (var i = 0; i < bassUI.qGetTrackQueueLength(); i++)
-            {
-                var fPath = bassUI.qGetTrackFileNameAtIndex(i);
-                var title = tagUI.qGetTrackTitle(fPath);
-                var artist = tagUI.qGetTrackArtist(fPath);
-                var length = tagUI.qGetTrackLength(fPath);
-
-                trackQueue.listModel.append({trackTitle: title, trackArtist: artist, trackLength: length})
-            }
-        }
-    }
-
-    MiscUIBackend{
-        id: miscUI
     }
 
     TagUIBackend{
         id: tagUI
-        onUpdateImage: {
-            console.log("triggered image update")
-            coverImage.source = "/Resources/emptycover.png"
-            coverImage.update()
-            coverImage.source = "image://coverImage"
-            coverImage.update()
-        }
     }
 
     FileDialog{

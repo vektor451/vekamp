@@ -5,8 +5,26 @@ import QtQuick.Controls
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import VekAmp
 
 Item {
+    BASSUIBackend{
+        id: bassUI
+        onNewTrackQueue: {
+            trackQueue.listModel.clear();
+
+            for (var i = 0; i < bassUI.qGetTrackQueueLength(); i++)
+            {
+                var fPath = bassUI.qGetTrackFileNameAtIndex(i);
+                var title = tagUI.qGetTrackTitle(fPath);
+                var artist = tagUI.qGetTrackArtist(fPath);
+                var length = tagUI.qGetTrackLength(fPath);
+
+                trackQueue.listModel.append({trackTitle: title, trackArtist: artist, trackLength: length})
+            }
+        }
+    }
+
     property var listModel: queueModel
 
     ScrollView {

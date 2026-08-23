@@ -5,11 +5,25 @@ import QtQuick.Controls
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import VekAmp
 
 Item{
     property var aboutDialog: aboutDialog
     property var bassERROR: bassERROR
     property var bassERRORText: bassERRORText
+
+    MiscUIBackend{
+        id: miscUI
+    }
+
+    BASSUIBackend{
+        id: bassUI
+
+        onBassError: {
+            miscPrompts.bassERROR.show();
+            miscPrompts.bassERRORText.text = message;
+        }
+    }
 
     // ERROR WINDOW
     Window{

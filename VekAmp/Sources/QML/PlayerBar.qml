@@ -5,8 +5,24 @@ import QtQuick.Controls
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import VekAmp
 
 ToolBar{
+    TagUIBackend{
+        id: tagUI
+    }
+
+    BASSUIBackend{
+        id: bassUI
+        onTrackChanged: {
+            trackName.text = tagUI.qGetCurTrackName();
+            playButton.updatePlayingIcon();
+        }
+        onPlayStateChanged: {
+            playButton.updatePlayingIcon();
+        }
+    }
+
     RowLayout{
         anchors.fill: parent
         spacing: 4

@@ -5,9 +5,30 @@ import QtQuick.Controls
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Dialogs
-
+import VekAmp
 
 ColumnLayout {
+    spacing: 2
+
+    TagUIBackend{
+        id: tagUI
+        onUpdateImage: {
+            console.log("triggered image update")
+            coverImage.source = "/Resources/emptycover.png"
+            coverImage.update()
+            coverImage.source = "image://coverImage"
+            coverImage.update()
+        }
+    }
+
+    BASSUIBackend{
+        id: bassUI
+        onTrackChanged: {
+            tagUI.qUpdateAlbumCover();
+            trackDetailLabel.text = tagUI.qGetTrackDetailStr();
+        }
+    }
+
     Frame{
         padding: 4
         horizontalPadding: 4
