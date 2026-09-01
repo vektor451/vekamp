@@ -1,3 +1,4 @@
+R"///("
 -- VekAmp DB ver1.0 -- 
 
 -- If you want to add new fields or constraints to existing tables 
@@ -82,3 +83,5 @@ CREATE TABLE IF NOT EXISTS Tracks (
 			ON DELETE RESTRICT
 			ON UPDATE RESTRICT
 );
+
+-- End Of File )///"

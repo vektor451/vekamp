@@ -8,6 +8,7 @@
 #include <QPalette>
 #include <QQuickImageProvider>
 #include <coverimageprovider.hpp>
+#include <QStandardPaths>
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +46,7 @@ int main(int argc, char *argv[])
 
     // SQLite Init
     LibraryDB::InitLibrary();
+    LibraryDB::InitDatabase(QStandardPaths::standardLocations(QStandardPaths::StandardLocation::MusicLocation).constFirst().toStdString());
 
     if(args.count())
     {
@@ -54,5 +56,6 @@ int main(int argc, char *argv[])
 
     int exit = app.exec();
     BASS::BASSPlayer::Destroy();
+    LibraryDB::CloseDatabase();
     return exit;
 }
