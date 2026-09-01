@@ -22,11 +22,7 @@ void LibraryDB::ProcessError(int err, const char* context)
 
 void LibraryDB::InitDatabase(std::string dirPath)
 {
-    if (database != nullptr)
-    {
-        sqlite3_close(database);
-        database = nullptr;
-    }
+    CloseDatabase();
 
     std::filesystem::create_directory(dirPath + libFolderPath);
     std::filesystem::create_directory(dirPath + libFolderPath);
