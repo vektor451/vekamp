@@ -1,6 +1,7 @@
 #include "librarydb.hpp"
 #include <QDebug>
-#include <filesystem>
+#include <tag.h>
+#include "bassplayer.hpp"
 
 sqlite3 * LibraryDB::database = nullptr;
 
@@ -46,6 +47,32 @@ void LibraryDB::InitDatabase(std::string dirPath)
 
         ProcessError(sqlite3_finalize(initDBStatement), "init statement");
     } while (err == SQLITE_DONE);
+}
+
+void LibraryDB::BeginIndex(std::string dirPath)
+{
+    // TODO: Implement threading
+    qDebug() << "Beginning index procedure.";
+    IndexNode(dirPath);
+}
+
+// This is a recursive function.
+void LibraryDB::IndexNode(std::filesystem::path dirPath)
+{
+    qDebug() << dirPath.u8string();
+    for (const auto& entry: std::filesystem::directory_iterator(dirPath))
+    {
+        if (entry.is_directory())
+        {
+            IndexNode(entry.path());
+        }
+
+        if(entry.is_regular_file())
+        {
+            //if (BASS::AudioFormat::GetFormat(entry.path()) == BASS::AudioFormat::NullFormat) continue;
+            //qDebug() << "Indexing file: " + entry.path().string();
+        }
+    }
 }
 
 void LibraryDB::CloseDatabase()

@@ -62,6 +62,10 @@ Window {
         id: bassUI
     }
 
+    LibraryUIBackend{
+        id: libraryUI
+    }
+
     TagUIBackend{
         id: tagUI
     }
@@ -75,6 +79,13 @@ Window {
             bassUI.qFileSelect(selectedFile);
         }
         fileMode: FileDialog.OpenFiles
+    }
+
+    FolderDialog{
+        id: libraryDialog
+        currentFolder: StandardPaths.standardLocations(StandardPaths.MusicLocation)[0]
+        title: qsTr("Select library root path...")
+
     }
 
     FileDialog{
@@ -103,12 +114,26 @@ Window {
 
                     Action{
                         text: qsTr("Open &File(s)")
+                        shortcut: "Ctrl+F"
                         onTriggered: fileDialog.open();
                     }
                     Action{
                         // Right now M3U is too non-standard for me to really care for adding support.
                         text: qsTr("Open &Playlist")
+                        shortcut: "Ctrl+P"
                         onTriggered: playlistDialog.open();
+                    }
+                    MenuSeparator{
+
+                    }
+                    Action{
+                        text: qsTr("Select &Library")
+                        onTriggered: libraryDialog.open();
+                    }
+                    Action{
+                        text:qsTr("&Reindex Library")
+                        shortcut: "Ctrl+R"
+                        onTriggered: libraryUI.qReindex();
                     }
                 }
                 Menu{

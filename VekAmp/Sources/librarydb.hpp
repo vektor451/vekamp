@@ -2,6 +2,7 @@
 #define LIBRARYDB_HPP
 #include <string>
 #include "sqlite3.h"
+#include <filesystem>
 
 constexpr const char *libFolderPath = "/VekAmp Data";
 constexpr const char *libFileName = "/Library.db";
@@ -15,10 +16,12 @@ class LibraryDB
     public:
         static void InitLibrary();
         static void InitDatabase(std::string dirPath);
+        static void BeginIndex(std::string dirPath);
         static void CloseDatabase();
     private:
         static sqlite3* database;
         static void ProcessError(int err, const char* context = "No context.");
+        static void IndexNode(std::filesystem::path dirPath);
 
 };
 

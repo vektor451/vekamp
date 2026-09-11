@@ -8,6 +8,7 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 if(WIN32)
     set(TAGLIB_PATH C:/taglib)
@@ -57,6 +58,8 @@ qt_add_qml_module(appVekAmp
         Sources/CPPBackend/coverimageprovider.cpp
         Sources/CPPBackend/taguibackend.hpp
         Sources/CPPBackend/taguibackend.cpp
+        Sources/CPPBackend/libraryuibackend.hpp
+        Sources/CPPBackend/libraryuibackend.cpp
     RESOURCES
         resources.qrc
         Resources/appicon.rc
@@ -173,6 +176,7 @@ set_target_properties(appVekAmp PROPERTIES
 target_link_libraries(appVekAmp
     PRIVATE Qt6::Quick
 )
+target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 target_link_libraries(appVekAmp PRIVATE Qt6::Core)
 
 include(GNUInstallDirs)
