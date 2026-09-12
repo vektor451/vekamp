@@ -40,6 +40,8 @@ qt_add_executable(appVekAmp
     ${app_icon_resource_windows}
 )
 
+target_sources(appVekAmp PUBLIC "vekamp.manifest")
+
 qt_add_qml_module(appVekAmp
     URI VekAmp
     QML_FILES

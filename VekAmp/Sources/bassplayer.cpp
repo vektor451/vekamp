@@ -113,6 +113,22 @@ namespace BASS
     }
 
     // AudioFormat Class.
+    std::map<AudioFormat::StreamFormat, std::vector<std::u8string>> AudioFormat::ExtNamesU8{
+        {StreamFormat::WAV, 	{u8"WAV", u8"WAVE"}},
+        {StreamFormat::FLAC, 	{u8"FLAC", }},
+        {StreamFormat::ALAC, 	{u8"CAF"}},
+        {StreamFormat::AIFF, 	{u8"AIFF", u8"AIF", u8"AIFC"}},
+        {StreamFormat::AAC, 	{u8"AIFF", u8"AIF", u8"AIFC"}},
+        {StreamFormat::APE, 	{u8"APE"}},
+        {StreamFormat::AAC, 	{u8"AAC", u8"3GP", u8"ADIF", u8"ADTS"}},
+        {StreamFormat::M4A, 	{u8"M4A", u8"M4R", u8"MP4", u8"M4P", u8"M4B", u8"M4V"}}, // BASS can play the audio from MP4s so why not.
+        {StreamFormat::MP3, 	{u8"MP3", u8"MPGA"}},
+        {StreamFormat::MP2, 	{u8"MP2", u8"MP2A", u8"M2A", u8"MPA"}},
+        {StreamFormat::MP1, 	{u8"MP1"}},
+        {StreamFormat::OGG, 	{u8"OGG"}},
+        {StreamFormat::OPUS, 	{u8"OPUS"}},
+    };
+
     std::map<AudioFormat::StreamFormat, std::vector<std::string>> AudioFormat::ExtNames{
         {StreamFormat::WAV, 	{"WAV", "WAVE"}},
         {StreamFormat::FLAC, 	{"FLAC", }},
@@ -121,7 +137,7 @@ namespace BASS
         {StreamFormat::AAC, 	{"AIFF", "AIF", "AIFC"}},
         {StreamFormat::APE, 	{"APE"}},
         {StreamFormat::AAC, 	{"AAC", "3GP", "ADIF", "ADTS"}},
-        {StreamFormat::M4A, 	{"M4A", "M4R", "MP4", "M4P", "M4B", "M4V"}}, // BASS can play the audio from MP4s so why not.
+        {StreamFormat::M4A, 	{"M4A", "M4R", "MP4", "M4P", "M4B", "M4V"}},
         {StreamFormat::MP3, 	{"MP3", "MPGA"}},
         {StreamFormat::MP2, 	{"MP2", "MP2A", "M2A", "MPA"}},
         {StreamFormat::MP1, 	{"MP1"}},
@@ -129,6 +145,24 @@ namespace BASS
         {StreamFormat::OPUS, 	{"OPUS"}},
     };
     
+    AudioFormat::StreamFormat AudioFormat::GetFormat(std::u8string fPath)
+    {
+        std::transform(fPath.begin(), fPath.end(), fPath.begin(), [](const char &c){ return std::toupper(c); });
+        for(int i = 0; i < StreamFormat::Count; i++)
+        {
+            size_t size = ExtNames[(StreamFormat)i].size();
+            for(int f = 0; f < size; f++)
+            {
+                if(StrEndsWith(fPath, ExtNamesU8[(StreamFormat)i][f]))
+                {
+                    return (StreamFormat)i;
+                }
+            }
+        }
+
+        return StreamFormat::NullFormat;
+    }
+
     AudioFormat::StreamFormat AudioFormat::GetFormat(std::string fPath)
     {
         std::transform(fPath.begin(), fPath.end(), fPath.begin(), [](const char &c){ return std::toupper(c); });
@@ -210,9 +244,6 @@ namespace BASS
     {
         qDebug() << "Creating stream for: " << fPath;
 
-        AudioFormat::StreamFormat format = AudioFormat::GetFormat(fPath);
-
-        DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
 #if _WIN32
         size_t fNameLength =  MultiByteToWideChar(CP_UTF8, 0, fPath, -1, NULL, 0);
         std::wstring fNameBufStr;
@@ -222,6 +253,9 @@ namespace BASS
 #else
         const char *fNameBuf = fPath;
 #endif
+        DWORD StreamFlags = BASS_SAMPLE_FLOAT | BASS_STREAM_PRESCAN;
+        AudioFormat::StreamFormat format = AudioFormat::GetFormat(fPath);
+
         // These formats should be definitive.
         if(format == AudioFormat::FLAC)
             *channel = BASS_FLAC_StreamCreateFile(FALSE, fNameBuf, 0, 0, StreamFlags);

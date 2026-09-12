@@ -233,6 +233,15 @@ TagLib::FileRef TagUIBackend::GetTrackFileRef(const char *filePath)
 #endif
 
     TagLib::FileRef file(fNameBuf);
+
+#if _WIN32
+    if (file.isNull() && std::wstring(fNameBuf).length() >= 260)
+    {
+        auto winShortName = GetWinShortPathName(fNameBuf);
+        file = TagLib::FileRef(winShortName);
+    }
+#endif
+
     return file;
 }
 

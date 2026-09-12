@@ -37,8 +37,10 @@ namespace BASS
 				Count // Amount of formats currently defined. 
             };
 
+            static std::map<StreamFormat, std::vector<std::u8string>> ExtNamesU8;
             static std::map<StreamFormat, std::vector<std::string>> ExtNames;
         
+            static StreamFormat GetFormat(std::u8string fPath);
             static StreamFormat GetFormat(std::string fPath);
     };
 

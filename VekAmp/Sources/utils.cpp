@@ -24,6 +24,11 @@ bool StrEndsWith(std::string_view str, std::string_view suffix)
     return str.size() >= suffix.size() && str.compare(str.size()-suffix.size(), suffix.size(), suffix) == 0;
 }
 
+bool StrEndsWith(std::u8string_view str, std::u8string_view suffix)
+{
+    return str.size() >= suffix.size() && str.compare(str.size()-suffix.size(), suffix.size(), suffix) == 0;
+}
+
 std::wstring coverFileNames[] = {
     L"cover.jpeg",
     L"cover.jpg",
@@ -37,7 +42,7 @@ std::wstring GetCoverFilePath(const char fPath[])
         std::wstring fNameBufStr;
         fNameBufStr.resize(fNameLength);
         MultiByteToWideChar(CP_UTF8, 0, fPath, -1, fNameBufStr.data(), fNameLength);
-        const WCHAR *fNameBuf = fNameBufStr.c_str();
+        //const WCHAR *fNameBuf = fNameBufStr.c_str();
 #else
         const char *fNameBuf = fPath;
 #endif
@@ -68,4 +73,20 @@ std::wstring GetCoverFilePath(const char fPath[])
     return L"";
 }
 
+#if _WIN32
 
+#include <fileapi.h>
+const wchar_t *GetWinShortPathName(const wchar_t *fPath)
+{
+    long     length = 0;
+    wchar_t* buffer = NULL;
+
+    length = GetShortPathNameW(fPath, NULL, 0);
+
+    buffer = new wchar_t[length];
+    GetShortPathNameW(fPath, buffer, length);
+
+    return buffer;
+    // might leak memory lol
+}
+#endif
