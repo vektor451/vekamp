@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS Tracks (
 	TrackFileModTime INTEGER,
 	TrackName TEXT,
 	TrackLengthSecs INTEGER,
+	TrackNum INTEGER,
+	TrackDisc INTEGER,
 	TrackYear INTEGER,
 	
 	ArtistID INTEGER,

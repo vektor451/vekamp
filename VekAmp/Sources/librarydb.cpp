@@ -381,7 +381,8 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
 
             // update info
             const char *updateQuery = R"(
-                UPDATE Tracks SET TrackFileModTime = ?, TrackName = ?, TrackLengthSecs = ?, TrackYear = ?, ArtistID = ?, CoverArtID = ?, AlbumID = ?, GenreID = ?
+                UPDATE Tracks SET TrackFileModTime = ?, TrackName = ?, TrackLengthSecs = ?, TrackNum = ?, TrackDisc = ?,
+                TrackYear = ?, ArtistID = ?, CoverArtID = ?, AlbumID = ?, GenreID = ?
                 WHERE TrackID = ?
             )";
 
@@ -406,13 +407,18 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
             ProcessError(sqlite3_bind_text(updateStatement, 2, title, -1, SQLITE_STATIC));
             ProcessError(sqlite3_bind_int64(updateStatement, 3, file.audioProperties()->lengthInSeconds()));
 
-            if (trackYear != 0)          ProcessError(sqlite3_bind_int64(updateStatement, 4, trackYear));
-            if (artistID != -32768)      ProcessError(sqlite3_bind_int64(updateStatement, 5, artistID));
-            if (coverArtID != -32768)    ProcessError(sqlite3_bind_int64(updateStatement, 6, coverArtID));
-            if (albumID != -32768)       ProcessError(sqlite3_bind_int64(updateStatement, 7, albumID));
-            if (genreID != -32768)       ProcessError(sqlite3_bind_int64(updateStatement, 8, genreID));
+            if (file.tag()->properties().contains("TRACKNUMBER"))
+                ProcessError(sqlite3_bind_int64(updateStatement, 4, file.tag()->properties().value("TRACKNUMBER")[0].toInt()));
+            if (file.tag()->properties().contains("DISCNUMBER"))
+                ProcessError(sqlite3_bind_int64(updateStatement, 5, file.tag()->properties().value("DISCNUMBER")[0].toInt()));
 
-            ProcessError(sqlite3_bind_int64(updateStatement, 9, trackID));
+            if (trackYear != 0)          ProcessError(sqlite3_bind_int64(updateStatement, 6, trackYear));
+            if (artistID != -32768)      ProcessError(sqlite3_bind_int64(updateStatement, 7, artistID));
+            if (coverArtID != -32768)    ProcessError(sqlite3_bind_int64(updateStatement, 8, coverArtID));
+            if (albumID != -32768)       ProcessError(sqlite3_bind_int64(updateStatement, 9, albumID));
+            if (genreID != -32768)       ProcessError(sqlite3_bind_int64(updateStatement, 10, genreID));
+
+            ProcessError(sqlite3_bind_int64(updateStatement, 11, trackID));
 
             ProcessError(sqlite3_step(updateStatement));
             ProcessError(sqlite3_finalize(updateStatement));
