@@ -21,20 +21,17 @@ CREATE TABLE IF NOT EXISTS Genres (
 
 CREATE TABLE IF NOT EXISTS CoverArts (
 	CoverArtID INTEGER PRIMARY KEY,
-	CoverArtOriginFilePath TEXT NOT NULL,
-	CoverArtThumb128xFilePath TEXT,
-	CoverArtThumb256xFilePath TEXT,
-	CoverArtThumb512xFilePath TEXT
+	CoverArtFilePath TEXT UNIQUE NOT NULL,
+	CoverArtModTime INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS Albums (
 	AlbumID INTEGER PRIMARY KEY,
 	AlbumName TEXT NOT NULL,
-	AlbumYear TEXT,
+	AlbumYear INTEGER,
 	
 	AlbumArtistID INTEGER,
 	CoverArtID INTEGER,
-	GenreID INTEGER,
 	
 	FOREIGN KEY (AlbumArtistID)
 		REFERENCES AlbumArtists (AlbumArtistID)
@@ -45,18 +42,17 @@ CREATE TABLE IF NOT EXISTS Albums (
 		REFERENCES CoverArts (CoverArtID)
 			ON DELETE SET NULL
 			ON UPDATE NO ACTION,
-			
-	FOREIGN KEY (GenreID)
-		REFERENCES Genres (GenreID)
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
+
+        UNIQUE (AlbumName, AlbumArtistID)
 );
 
 CREATE TABLE IF NOT EXISTS Tracks (
 	TrackID INTEGER PRIMARY KEY,
 	TrackFilePath TEXT UNIQUE NOT NULL,
-	TrackLengthSecs INTEGER NOT NULL,
-	TrackYear TEXT,
+	TrackFileModTime INTEGER,
+	TrackName TEXT,
+	TrackLengthSecs INTEGER,
+	TrackYear INTEGER,
 	
 	ArtistID INTEGER,
 	CoverArtID INTEGER,

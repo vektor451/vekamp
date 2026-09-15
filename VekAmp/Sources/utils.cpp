@@ -33,6 +33,18 @@ std::wstring coverFileNames[] = {
     L"cover.jpeg",
     L"cover.jpg",
     L"cover.png",
+    L"folder.jpeg",
+    L"folder.jpg",
+    L"folder.png",
+};
+
+std::u8string coverFileNamesU8[] = {
+    u8"cover.jpeg",
+    u8"cover.jpg",
+    u8"cover.png",
+    u8"folder.jpeg",
+    u8"folder.jpg",
+    u8"folder.png",
 };
 
 std::wstring GetCoverFilePath(const char fPath[])
@@ -46,10 +58,6 @@ std::wstring GetCoverFilePath(const char fPath[])
 #else
         const char *fNameBuf = fPath;
 #endif
-
-    qDebug() << "begin";
-    //auto foo = std::filesystem::path(fNameBufStr);
-    qDebug() << "2";
 
 #if _WIN32
     std::wstring fileDir = std::filesystem::path(fNameBufStr).remove_filename().wstring();
@@ -71,6 +79,46 @@ std::wstring GetCoverFilePath(const char fPath[])
 
     // No file found.
     return L"";
+}
+
+std::wstring GetCoverFilePath(const wchar_t fPath[])
+{
+    std::wstring fileDir = std::filesystem::path(fPath).remove_filename().wstring();
+
+    for (const auto& file : std::filesystem::directory_iterator(fileDir))
+    {
+        std::wstring lowerFileName = file.path().filename().wstring();
+        std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), [](const char &c){ return std::tolower(c); });
+
+        // Check if cover exists.
+        if(std::count(std::begin(coverFileNames), std::end(coverFileNames), lowerFileName) > 0)
+        {
+            return file.path().wstring();
+        }
+    }
+
+    // No file found.
+    return L"";
+}
+
+std::u8string GetCoverFilePathU8(std::u8string fPath)
+{
+    std::u8string fileDir = std::filesystem::path(fPath).remove_filename().u8string();
+
+    for (const auto& file : std::filesystem::directory_iterator(fileDir))
+    {
+        std::u8string lowerFileName = file.path().filename().u8string();
+        std::transform(lowerFileName.begin(), lowerFileName.end(), lowerFileName.begin(), [](const char8_t &c){ return std::tolower(c); });
+
+        // Check if cover exists.
+        if(std::count(std::begin(coverFileNamesU8), std::end(coverFileNamesU8), lowerFileName) > 0)
+        {
+            return file.path().u8string();
+        }
+    }
+
+    // No file found.
+    return std::u8string();
 }
 
 #if _WIN32
