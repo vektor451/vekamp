@@ -1,6 +1,7 @@
 #include "libraryuibackend.hpp"
 #include "librarydb.hpp"
 #include <QStandardPaths>
+#include <thread>
 
 LibraryUIBackend::LibraryUIBackend(QObject *parent)
     : QObject{parent}
@@ -8,5 +9,9 @@ LibraryUIBackend::LibraryUIBackend(QObject *parent)
 
 void LibraryUIBackend::qReindex()
 {
-    LibraryDB::BeginIndex(QStandardPaths::standardLocations(QStandardPaths::StandardLocation::MusicLocation).constFirst().toStdString());
+    std::thread task(
+        LibraryDB::BeginIndex,
+        QStandardPaths::standardLocations(QStandardPaths::StandardLocation::MusicLocation).constFirst().toStdString()
+    );
+    task.detach();
 }
