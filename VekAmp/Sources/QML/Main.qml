@@ -9,10 +9,10 @@ import VekAmp
 
 Window {
     id: window;
-    width: 960
-    height: 600
-    minimumWidth: 640
-    minimumHeight: 480
+    width: 1024
+    height: 640
+    minimumWidth: 960
+    minimumHeight: 540
     visible: true
     title: qsTr("VekAmp")
 
@@ -171,12 +171,11 @@ Window {
 
                 RowLayout{
                     anchors.fill: parent
+                    spacing: 0
 
-                    Frame {
-                        verticalPadding: 2
-                        horizontalPadding: 2
-                        Layout.preferredWidth: 192
+                    Library {
                         Layout.fillHeight: true
+                        Layout.fillWidth: true
                     }
 
                     Frame {
