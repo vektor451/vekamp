@@ -247,14 +247,14 @@ SplitView{
                                         }
 
                                         ListElement{
-                                            trackNum: "03"
+                                            trackNum: "99"
                                             trackTitle: "Track Title"
                                             trackArtist: ""
                                             trackLength: "4:20"
                                         }
 
                                         ListElement{
-                                            trackNum: "01"
+                                            trackNum: "1"
                                             trackTitle: "Track Title"
                                             trackArtist: ""
                                             trackLength: "4:20"
@@ -298,6 +298,7 @@ SplitView{
                                                 horizontalAlignment: Text.AlignRight
                                                 Layout.preferredWidth: 24
                                                 rightPadding: 0
+                                                color: "grey"
                                             }
 
                                             Label {
