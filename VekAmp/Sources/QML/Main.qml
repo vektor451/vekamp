@@ -101,6 +101,9 @@ Window {
         anchors.fill: parent
         padding: 0
         font.family: interFont.font.family;
+        font.features: {
+            "tnum": 1
+        }
 
         ColumnLayout{
             anchors.fill: parent
