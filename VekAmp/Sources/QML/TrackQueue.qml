@@ -7,7 +7,11 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import VekAmp
 
-Item {
+Pane {
+    topPadding: 0
+    leftPadding: 2
+    rightPadding: 2
+    bottomPadding: 2
     BASSUIBackend{
         id: bassUI
         onNewTrackQueue: {
@@ -38,6 +42,9 @@ Item {
             anchors.right: parent.right
             spacing: 2
             clip: true
+
+            acceptedButtons: Qt.NoButton
+            boundsBehavior: Flickable.StopAtBounds
 
             model: ListModel{
                 id: queueModel

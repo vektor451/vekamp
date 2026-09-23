@@ -128,37 +128,17 @@ ToolBar{
                     bassUI.qSetTrackProgress(value);
                 }
 
-                MouseArea{
-                    id: progressArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-
-                    // TODO: Figure out way to pause playback while seeking
-                    onPressed:{
-                        mouse.accepted = false;
-                        //bassUI.qSliderAdjustPause(true)
-                    }
-
-                    TapHandler{
-                        id: progressAreaTapHandler
-                        onGrabChanged: {
-                            "console.log: boo"
-                        }
-                    }
-
-                    DragHandler{
-                        id: progressAreaDragHandler
-                        onGrabChanged: {
-                            "console.log: boo"
-                        }
-                    }
+                onPressedChanged: {
+                    bassUI.qSliderAdjustPause(pressed)
                 }
+
+
 
                 Timer{
                     id: progressTimer
                     interval: 10; running: true; repeat: true
                     onTriggered: {
-                        if(!progressAreaTapHandler.pressed)
+                        if(!progressSlider.pressed)
                         {
                             progressSlider.value = bassUI.qGetTrackLen();
                             trackProgress.text = bassUI.qGetTrackLenStr();
@@ -166,7 +146,7 @@ ToolBar{
                         }
                         else
                         {
-                            //console.log(progressAreaTapHandler.pressed);
+
                         }
                     }
                 }

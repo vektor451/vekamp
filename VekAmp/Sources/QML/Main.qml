@@ -22,6 +22,11 @@ Window {
         print("focus changed: " + activeFocusItem);
     }
 
+    SystemPalette {
+        id: mainPalette;
+        colorGroup: SystemPalette.Active
+    }
+
     FontLoader{
         id: interFont;
         source: "/Resources/interFont/Inter_18pt-Regular.ttf"
@@ -172,48 +177,54 @@ Window {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                RowLayout{
+                SplitView{
                     anchors.fill: parent
-                    spacing: 0
 
                     Library {
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
+                        SplitView.fillHeight: true
+                        SplitView.fillWidth: true
+                        SplitView.minimumWidth: 128 + 512
                     }
 
                     Frame {
-                        verticalPadding: 2
-                        bottomPadding: 3
-                        horizontalPadding: 2
-                        Layout.preferredWidth: 262
-                        Layout.fillHeight: true
-                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                        padding: 0
+                        SplitView.preferredWidth: 262
+                        SplitView.minimumWidth: 128
+                        SplitView.fillHeight: true
+                        //Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
                         ColumnLayout {
                             anchors.fill: parent
-                            Layout.fillHeight: true
-                            Layout.fillWidth: false
                             spacing: 2
 
                             Label{
                                 text: "**Track Queue**"
                                 textFormat: Text.MarkdownText
-                                topPadding: 1
-                                leftPadding: 2
-                                bottomPadding: 1
+                                topPadding: 3
+                                leftPadding: 4
+                                bottomPadding: 0
                             }
 
-                            TrackQueue{
-                                id: trackQueue
+                            SplitView{
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
-                            }
+                                orientation: Qt.Vertical
 
-                            TrackMetaView{
-                                Layout.fillWidth: true
-                                Layout.fillHeight: false
-                            }
+                                TrackQueue{
+                                    id: trackQueue
+                                    SplitView.fillWidth: true
+                                    SplitView.fillHeight: true
+                                    SplitView.minimumHeight: 128
+                                }
 
+                                TrackMetaView{
+                                    SplitView.fillWidth: true
+                                    SplitView.fillHeight: false
+
+                                    SplitView.minimumHeight: 192
+                                    SplitView.preferredHeight: 329
+                                }
+                            }
                         }
                     }
                 }

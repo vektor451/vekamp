@@ -21,10 +21,15 @@ SplitView{
             clip: true
 
             ListView {
+                id: categoryView
                 anchors.left: parent.left
                 anchors.right: parent.right
                 spacing: 2
                 clip: true
+
+                acceptedButtons: Qt.NoButton
+
+                boundsBehavior: Flickable.StopAtBounds
 
                 model: ListModel{
                     id: categoryModel
@@ -42,6 +47,7 @@ SplitView{
                 }
 
                 delegate: Frame {
+                    id: categoryFrame
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.leftMargin: 0
@@ -51,6 +57,18 @@ SplitView{
 
                     contentWidth: libraryCategoryLayout.implicitWidth
                     contentHeight: libraryCategoryLayout.implicitHeight
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.leftMargin: -1
+                        anchors.rightMargin: -1
+                        anchors.topMargin: -1
+                        anchors.bottomMargin: -1
+
+                        color: categoryFrame.activeFocus ?
+                                   mainPalette.highlight : categoryView.currentIndex === index ?
+                                       "#10FFFFFF" : "#00000000"
+                    }
 
                     RowLayout{
                         id: libraryCategoryLayout
@@ -78,11 +96,33 @@ SplitView{
                             wrapMode: Text.NoWrap
                             elide: Text.ElideRight
                         }
+
+                        focus: true
+                        focusPolicy: Qt.ClickFocus
+                    }
+
+                    MouseArea{
+                        anchors.fill: parent
+                        anchors.leftMargin : -3
+                        anchors.rightMargin : -3
+                        anchors.topMargin : -3
+                        anchors.bottomMargin : -3
+
+                        onPressed: {
+                            categoryView.currentIndex = index
+                            categoryFrame.forceActiveFocus()
+
+                        }
+
+                        //onDoubleClicked: {
+                        //
+                        //}
                     }
                 }
             }
         }
     }
+
     Frame { // Records
         verticalPadding: 2
         horizontalPadding: 2
@@ -101,6 +141,9 @@ SplitView{
                 spacing: 2
                 clip: true
 
+                boundsBehavior: Flickable.StopAtBounds
+
+                //interactive: false
 
                 model: ListModel {
                     id: recordModel
@@ -185,6 +228,7 @@ SplitView{
                                     height: contentHeight
                                     Layout.fillWidth: true
                                     spacing: 0
+                                    interactive: false
                                     //clip: true
 
                                     model: ListModel {

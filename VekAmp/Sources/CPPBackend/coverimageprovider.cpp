@@ -11,8 +11,8 @@ QPixmap CoverImageProvider::requestPixmap(const QString &id, QSize *size, const 
 {
     qDebug() << "Requesting new image...";
 
-    int width = 256;
-    int height = 256;
+    int width = 1024;
+    int height = 1024;
 
     if (size)
         *size = QSize(width, height);
@@ -31,6 +31,7 @@ QPixmap CoverImageProvider::requestPixmap(const QString &id, QSize *size, const 
     }
     else
     {
+        // FIXME: Make sure embedded data is loaded with correct asepct ratio.
         qDebug() << "Loading from embedded data.";
         pixmap.loadFromData(imgData);
     }

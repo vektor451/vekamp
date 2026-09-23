@@ -102,10 +102,7 @@ qreal BASSUIBackend::qGetTrackLen()
 
 void BASSUIBackend::qSetTrackProgress(qreal value)
 {
-    if(!BASS::BASSPlayer::IsScrolling())
-    {
-        BASS::BASSPlayer::SetPos(value * BASS::BASSPlayer::GetTrackLenSecs());
-    }
+    BASS::BASSPlayer::SetPos(value * BASS::BASSPlayer::GetTrackLenSecs());
 }
 
 void BASSUIBackend::qSliderAdjustPause(bool pressed)
