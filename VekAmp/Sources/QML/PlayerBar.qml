@@ -132,8 +132,6 @@ ToolBar{
                     bassUI.qSliderAdjustPause(pressed)
                 }
 
-
-
                 Timer{
                     id: progressTimer
                     interval: 10; running: true; repeat: true
@@ -146,7 +144,7 @@ ToolBar{
                         }
                         else
                         {
-
+                            trackProgress.text = bassUI.qGetTrackLenStr();
                         }
                     }
                 }

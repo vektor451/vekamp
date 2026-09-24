@@ -41,7 +41,7 @@ ColumnLayout {
             textFormat: Text.RichText
             text: qsTr("Track details will appear here.")
             lineHeight: 1
-            font.pointSize: 8
+            //font.pointSize: 8
             width: parent.width;
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         }
