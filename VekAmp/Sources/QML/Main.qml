@@ -222,7 +222,7 @@ Window {
                                     SplitView.fillHeight: false
 
                                     SplitView.minimumHeight: 192
-                                    SplitView.preferredHeight: 329
+                                    SplitView.preferredHeight: 333
                                 }
                             }
                         }
