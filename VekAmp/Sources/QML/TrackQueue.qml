@@ -32,12 +32,12 @@ Pane {
     property var listModel: queueModel
 
     ScrollView {
-        id: scrollView1
         anchors.fill: parent
         ScrollBar.vertical.policy: ScrollBar.AsNeeded
         clip: true
 
         ListView {
+            id: queueView
             anchors.left: parent.left
             anchors.right: parent.right
             spacing: 2
@@ -55,8 +55,7 @@ Pane {
                 required property string trackArtist
                 required property string trackLength
 
-                anchors.left: parent.left
-                anchors.right: parent.right
+                width: queueView.width - 12
                 anchors.leftMargin: 0
                 anchors.rightMargin: 12
                 transformOrigin: Item.Center

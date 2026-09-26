@@ -56,8 +56,7 @@ SplitView{
                     required property int index;
 
                     id: categoryFrame
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    width: categoryView.width - 12
                     anchors.leftMargin: 0
                     anchors.rightMargin: 12
                     transformOrigin: Item.Center
