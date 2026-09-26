@@ -8,8 +8,8 @@ import QtQuick.Dialogs
 import VekAmp
 
 SplitView{
-
     LibraryUIBackend{
+        id: libraryUI
         onRefreshLibrary: {
             // Categories
             categoryModel.clear();
@@ -20,6 +20,24 @@ SplitView{
             }
 
             print("library refreshed!");
+        }
+
+        function updateRecordsView(){
+            qRefreshRecords(categoryView.currentIndex);
+
+            recordModel.clear();
+            for (var i = 0; i < qGetRecordCount(); i++)
+            {
+                var entry = qGetRecordEntry(i);
+                recordModel.append({
+                    recordName: entry.recordName,
+                    recordYear: entry.year,
+                    recordLength: entry.length,
+                    recordCoverPath: entry.picPath,
+                })
+
+                print(entry.qGetTrackCount())
+            }
         }
     }
 
@@ -48,6 +66,10 @@ SplitView{
 
                 model: ListModel{
                     id: categoryModel
+                }
+
+                onCurrentIndexChanged: {
+                    libraryUI.updateRecordsView();
                 }
 
                 delegate: Frame {
@@ -158,10 +180,14 @@ SplitView{
             clip: true
 
             ListView {
+                id: recordView
                 anchors.left: parent.left
                 anchors.right: parent.right
                 spacing: 2
                 clip: true
+                reuseItems: true
+
+                cacheBuffer: 4096
 
                 boundsBehavior: Flickable.StopAtBounds
 
@@ -169,19 +195,17 @@ SplitView{
 
                 model: ListModel {
                     id: recordModel
-                    ListElement{albumName: "Cool Album"}
-                    ListElement{albumName: "Cool Album"}
-                    ListElement{albumName: "Cool Album"}
-                    ListElement{albumName: "Cool Album"}
                 }
 
                 delegate: Pane {
-                    required property string albumName;
+                    required property string recordName;
+                    required property string recordYear;
+                    required property string recordLength;
+                    required property string recordCoverPath;
+                    property ListModel recordTrackModel: trackModel;
+                    //required property int index;
 
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: 0
-                    anchors.rightMargin: 12
+                    width: recordView.width - 12
                     transformOrigin: Item.Center
                     leftPadding: 8
                     topPadding: 8
@@ -195,13 +219,16 @@ SplitView{
 
                         Image {
                             //id: queueImage
-                            source: "/Resources/emptycover.png"
+                            source: recordCoverPath
                             verticalAlignment: Image.AlignVCenter
                             sourceSize.width: 128
                             sourceSize.height: 128
+                            width: 128
+                            height: 128
                             fillMode: Image.PreserveAspectFit
                             Layout.alignment: Qt.AlignTop
-                            cache: false;
+                            cache: true;
+                            asynchronous: true;
                         }
 
                         Pane {
@@ -222,7 +249,7 @@ SplitView{
                                 anchors.rightMargin: 12
 
                                 Label {
-                                    text: "Album Name"
+                                    text: recordName
                                     font.pointSize: 14
                                     font.bold: true
 
@@ -231,7 +258,7 @@ SplitView{
 
                                 RowLayout {
                                     Label {
-                                        text: "2069 | Epic Tunes"
+                                        text: recordYear
                                         color: "grey"
 
                                         wrapMode: Text.NoWrap
@@ -240,7 +267,7 @@ SplitView{
                                         Layout.fillWidth: true
                                     }
                                     Label {
-                                        text: "420 mins"
+                                        text: recordLength;
                                         color: "grey"
                                     }
                                 }

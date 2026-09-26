@@ -31,7 +31,9 @@ int main(int argc, char *argv[])
     const QStringList args = parser.positionalArguments();
 
     // register necessary types
-    qmlRegisterType<RecordCategoryEntry>("com.vekAmp.recordStructs", 1, 0, "RecordCategoryEntry");
+    qmlRegisterType<RecordCategoryEntry>("com.vekAmp.recordStructs", 1, 0, "recordCategoryEntry");
+    qmlRegisterType<RecordEntry>("com.vekAmp.recordStructs", 1, 0, "recordEntry");
+    qmlRegisterType<TrackEntry>("com.vekAmp.recordStructs", 1, 0, "trackEntry");
 
     QQmlApplicationEngine engine;
     QObject::connect(

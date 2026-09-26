@@ -28,6 +28,7 @@ class LibraryDB : public QObject
         static void BeginIndex(std::string dirPath);
         static void CloseDatabase();
         static std::vector<RecordCategoryEntry> GetRecordCategoryEntries();
+        static std::vector<RecordEntry> GetRecordEntries(int categoryIdx, LibraryUIBackend *backendObj);
     private:
         static sqlite3 *database;
         static LibraryDB *singletonInstance;

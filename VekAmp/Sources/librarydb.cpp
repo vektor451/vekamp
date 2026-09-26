@@ -451,6 +451,7 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
 
 std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 {
+    // all records
     auto entries = std::vector<RecordCategoryEntry>();
 
     const char *allRecordsCountQuery = R"(
@@ -463,7 +464,7 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 
     ProcessError(sqlite3_step(allRecStatement));
     long long count = sqlite3_column_int64(allRecStatement, 0);
-    ProcessError(sqlite3_step(allRecStatement));
+    //ProcessError(sqlite3_step(allRecStatement));
 
     ProcessError(sqlite3_finalize(allRecStatement));
 
@@ -472,6 +473,7 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
     allCategoriesEntry.mExtraInfo = std::to_string(count).append(count > 1 ? " records" : " record").c_str();
     entries.push_back(allCategoriesEntry);
 
+    // unknown records
     const char *unknownRecordsCountQuery = R"(
         SELECT Count(AlbumID) FROM Albums WHERE AlbumArtistID IS NULL
     )";
@@ -482,7 +484,7 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 
     ProcessError(sqlite3_step(unknowQueryStatement));
     count = sqlite3_column_int64(unknowQueryStatement, 0);
-    ProcessError(sqlite3_step(unknowQueryStatement));
+    //ProcessError(sqlite3_step(unknowQueryStatement));
 
     ProcessError(sqlite3_finalize(unknowQueryStatement));
 
@@ -491,6 +493,7 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
     unknownCategoriesEntry.mExtraInfo = std::to_string(count + 1).append(count > 0 ? " records" : " record").c_str();
     entries.push_back(unknownCategoriesEntry);
 
+    // artist names
     const char *indexQuery = R"(
         SELECT AlbumArtistName FROM AlbumArtists ORDER BY LOWER(AlbumArtistName) ASC
     )";
@@ -499,15 +502,18 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 
     ProcessError(sqlite3_prepare_v2(database, indexQuery, strlen(indexQuery), &indexStatement, &indexQuery));
 
-    int err = sqlite3_step(indexStatement);
+    int err = SQLITE_ROW;
     while (err == SQLITE_ROW){
-        const char *categoryName = reinterpret_cast<const char *>(sqlite3_column_text(indexStatement, 0));
         err = sqlite3_step(indexStatement);
+        const char *categoryName = reinterpret_cast<const char *>(sqlite3_column_text(indexStatement, 0));
+        //err = sqlite3_step(indexStatement);
 
         if (err != SQLITE_ROW) break;
 
         const char *countQuery = R"(
-            SELECT COUNT(AlbumID) FROM Albums JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID WHERE AlbumArtistName = ?
+            SELECT COUNT(AlbumID) FROM Albums
+            LEFT JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID
+            WHERE AlbumArtistName = ?
         )";
 
         sqlite3_stmt *countStatement = nullptr;
@@ -529,6 +535,148 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
     }
 
     ProcessError(sqlite3_finalize(indexStatement));
+
+    return entries;
+}
+
+std::vector<RecordEntry> LibraryDB::GetRecordEntries(int categoryIdx, LibraryUIBackend *backendObj)
+{
+    auto entries = std::vector<RecordEntry>();
+
+    const char *albumsQueryBase = R"(
+        SELECT AlbumID, AlbumName, CoverArtFilePath, AlbumArtistName, AlbumYear FROM Albums
+            LEFT JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID
+            LEFT JOIN CoverArts ON Albums.CoverArtID = CoverArts.CoverArtID
+            WHERE AlbumArtistName = ?
+        ORDER BY
+            CASE WHEN AlbumYear IS NULL THEN 0 ELSE 1 END,
+            CASE WHEN AlbumName IS NULL THEN 0 ELSE 1 END,
+            AlbumYear ASC, LOWER(AlbumName) ASC
+    )";
+
+    const char *albumsQueryAll = R"(
+        SELECT AlbumID, AlbumName, CoverArtFilePath, AlbumArtistName, AlbumYear FROM Albums
+            LEFT JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID
+            LEFT JOIN CoverArts ON Albums.CoverArtID = CoverArts.CoverArtID
+        ORDER BY
+            CASE WHEN AlbumYear IS NULL THEN 0 ELSE 1 END,
+            CASE WHEN AlbumName IS NULL THEN 0 ELSE 1 END,
+            AlbumYear ASC, LOWER(AlbumName) ASC
+    )";
+
+    const char *albumsQueryUnknown = R"(
+        SELECT AlbumID, AlbumName, CoverArtFilePath, AlbumArtistName, AlbumYear FROM Albums
+            LEFT JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID
+            LEFT JOIN CoverArts ON Albums.CoverArtID = CoverArts.CoverArtID
+            WHERE AlbumArtistName IS NULL
+        ORDER BY
+            CASE WHEN AlbumYear IS NULL THEN 0 ELSE 1 END,
+            CASE WHEN AlbumName IS NULL THEN 0 ELSE 1 END,
+            AlbumYear ASC, LOWER(AlbumName) ASC
+    )";
+
+    const char *albumsQuery;
+
+    switch (categoryIdx)
+    {
+        case 0:
+            albumsQuery = albumsQueryAll;
+            break;
+        case 1:
+            albumsQuery = albumsQueryUnknown;
+            break;
+        default:
+            albumsQuery = albumsQueryBase;
+            break;
+    }
+
+    sqlite3_stmt *albumsStatement = nullptr;
+
+    ProcessError(sqlite3_prepare_v2(database, albumsQuery, strlen(albumsQuery), &albumsStatement, &albumsQuery));
+
+    if (categoryIdx > 1) ProcessError(
+        sqlite3_bind_text(
+            albumsStatement, 1,
+            backendObj->qGetRecordCategoryEntry(categoryIdx).mCategoryName.toStdString().c_str(),
+            -1, SQLITE_TRANSIENT
+        )
+    );
+
+    int err = SQLITE_ROW;
+    while (err == SQLITE_ROW){
+        err = sqlite3_step(albumsStatement);
+        long long albumID = sqlite3_column_int64(albumsStatement, 0);
+        const char *albumName = reinterpret_cast<const char *>(sqlite3_column_text(albumsStatement, 1));
+        const char *coverPath = reinterpret_cast<const char *>(sqlite3_column_text(albumsStatement, 2));
+        const char *artistName = reinterpret_cast<const char *>(sqlite3_column_text(albumsStatement, 3));
+        const char *albumYear = reinterpret_cast<const char *>(sqlite3_column_text(albumsStatement, 4));
+        //err = sqlite3_step(albumsStatement);
+
+        if (err != SQLITE_ROW) break;
+
+        auto entry = RecordEntry();
+        entry.mRecordName = albumName == nullptr ? QString() : albumName;
+        entry.mPicPath = coverPath == nullptr ? QString() : coverPath;
+        entry.mArtist = artistName == nullptr ? QString() : artistName;
+        entry.mYear = albumYear == nullptr ? QString() : albumYear;
+        entry.mTracks = std::vector<TrackEntry>();
+
+        entry.mPicPath = "file:" + entry.mPicPath;
+
+        double trackSecs = 0;
+
+        const char *tracksQuery = R"(
+            SELECT TrackName, TrackYear, ArtistName, GenreName, TrackLengthSecs, TrackNum, TrackDisc FROM Tracks
+                LEFT JOIN Artists ON Tracks.ArtistID = Artists.ArtistID
+                LEFT JOIN Genres ON Tracks.GenreID = Genres.GenreID
+                WHERE AlbumID = ?
+            ORDER BY
+                CASE WHEN TrackDisc IS NULL THEN 0 ELSE 1 END,
+                CASE WHEN TrackNum IS NULL THEN 0 ELSE 1 END,
+                TrackDisc ASC, TrackNum ASC
+        )";
+
+        sqlite3_stmt *tracksStatement = nullptr;
+
+        ProcessError(sqlite3_prepare_v2(database, tracksQuery, strlen(tracksQuery), &tracksStatement, &tracksQuery));
+        ProcessError(sqlite3_bind_int64(tracksStatement, 1, albumID));
+
+        int err2 = SQLITE_ROW;
+        while (err2 == SQLITE_ROW){
+            const char *trackName = reinterpret_cast<const char *>(sqlite3_column_text(tracksStatement, 0));
+            const char *trackYear = reinterpret_cast<const char *>(sqlite3_column_text(tracksStatement, 1));
+            const char *trackArtist = reinterpret_cast<const char *>(sqlite3_column_text(tracksStatement, 2));
+            const char *genreName = reinterpret_cast<const char *>(sqlite3_column_text(tracksStatement, 3));
+            int trackLength = sqlite3_column_int(albumsStatement, 4);
+            int trackNum = sqlite3_column_int(albumsStatement, 5);
+            int trackDisc = sqlite3_column_int(albumsStatement, 6);
+
+            err2 = sqlite3_step(tracksStatement);
+
+            if (err2 != SQLITE_ROW) break;
+
+            trackSecs += trackLength;
+
+            auto trackEntry = TrackEntry();
+            trackEntry.mTrackName = trackName == nullptr ? QString() : trackName;
+            trackEntry.mYear = trackYear == nullptr ? QString() : trackYear;
+            trackEntry.mArtist = trackArtist == nullptr ? QString() : trackArtist;
+            trackEntry.mGenre = genreName == nullptr ? QString() : genreName;
+            trackEntry.mLength = (std::to_string(trackLength / 60) + ":" + std::to_string(trackLength % 60)).c_str();
+            trackEntry.mTrackNum = trackNum;
+            trackEntry.mTrackDisc = trackDisc;
+
+            entry.mTracks.push_back(trackEntry);
+        }
+
+        ProcessError(sqlite3_finalize(tracksStatement));
+
+        entry.mLength = (std::to_string((int)std::ceil(trackSecs / 60)) + " mins").c_str();
+
+        entries.push_back(entry);
+    }
+
+    ProcessError(sqlite3_finalize(albumsStatement));
 
     return entries;
 }
