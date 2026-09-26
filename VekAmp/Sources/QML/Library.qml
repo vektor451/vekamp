@@ -8,6 +8,21 @@ import QtQuick.Dialogs
 import VekAmp
 
 SplitView{
+
+    LibraryUIBackend{
+        onRefreshLibrary: {
+            // Categories
+            categoryModel.clear();
+            for (var i = 0; i < qGetRecordCategoryCount(); i++)
+            {
+                var entry = qGetRecordCategoryEntry(i);
+                categoryModel.append({categoryName: entry.categoryName})
+            }
+
+            print("library refreshed!");
+        }
+    }
+
     Frame { // Categories
         verticalPadding: 2
         horizontalPadding: 2
@@ -33,20 +48,12 @@ SplitView{
 
                 model: ListModel{
                     id: categoryModel
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
-                    ListElement{} ListElement{} ListElement{} ListElement{} ListElement{} ListElement{}
                 }
 
                 delegate: Frame {
+                    required property string categoryName;
+                    required property int index;
+
                     id: categoryFrame
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -88,7 +95,7 @@ SplitView{
                         }
 
                         Label{
-                            text: "Artist"
+                            text: categoryName
                             Layout.fillWidth: true
                             Layout.fillHeight: false
                             Layout.alignment: Qt.AlignVCenter

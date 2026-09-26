@@ -1,7 +1,5 @@
 #pragma once
 
-#include "bassuibackend.hpp"
-
 #include <map>
 #include <vector>
 #include <string>
@@ -11,6 +9,9 @@
 #include <bassflac.h> 
 #include <bassopus.h>
 #include <thread>
+#include <QObject>
+#include <QQmlEngine>
+#include <QtTypes>
 
 namespace BASS 
 {

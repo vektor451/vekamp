@@ -8,6 +8,22 @@
 #include "utils.hpp"
 
 sqlite3 * LibraryDB::database = nullptr;
+LibraryDB * LibraryDB::singletonInstance = nullptr;
+
+LibraryDB::LibraryDB(QObject *parent)
+    : QObject{parent}
+{
+    if(singletonInstance != nullptr)
+    {
+        throw std::logic_error("Singleton objects should only be created once.");
+    }
+    singletonInstance = this;
+}
+
+LibraryDB *LibraryDB::GetSingletonInstance()
+{
+    return singletonInstance;
+}
 
 void LibraryDB::InitLibrary()
 {
@@ -51,6 +67,8 @@ void LibraryDB::InitDatabase(std::string dirPath)
 
         ProcessError(sqlite3_finalize(initDBStatement), "init statement");
     } while (err == SQLITE_DONE);
+
+    emit singletonInstance->refreshLibrary();
 }
 
 void LibraryDB::BeginIndex(std::string dirPath)
@@ -71,6 +89,7 @@ void LibraryDB::BeginIndex(std::string dirPath)
     auto timeTakenM = std::chrono::duration_cast<std::chrono::minutes>(timeTaken);
 
     qDebug() << "Time taken to index:" << timeTakenM << timeTakenS << timeTakenMS;
+    emit singletonInstance->refreshLibrary();
 }
 
 // This is a recursive function.
@@ -424,6 +443,47 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
             ProcessError(sqlite3_finalize(updateStatement));
         }
     }
+}
+
+std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
+{
+    auto entries = std::vector<RecordCategoryEntry>();
+
+    auto allCategoriesEntry = RecordCategoryEntry();
+    allCategoriesEntry.mCategoryName = "All Artists";
+    allCategoriesEntry.mRecordsExtraInfo = "hello here is my awesome extra info";
+    entries.push_back(allCategoriesEntry);
+
+    auto unknownCategoriesEntry = RecordCategoryEntry();
+    unknownCategoriesEntry.mCategoryName = "Unknown Artists";
+    unknownCategoriesEntry.mRecordsExtraInfo = "hello here is my awesome extra info";
+    entries.push_back(unknownCategoriesEntry);
+
+    const char *indexQuery = R"(
+        SELECT AlbumArtistName FROM AlbumArtists ORDER BY AlbumArtistName ASC
+    )";
+
+    sqlite3_stmt *indexStatement = nullptr;
+
+    ProcessError(sqlite3_prepare_v2(database, indexQuery, strlen(indexQuery), &indexStatement, &indexQuery));
+
+    int err = sqlite3_step(indexStatement);
+    while (err == SQLITE_ROW){
+        const char *categoryName = reinterpret_cast<const char *>(sqlite3_column_text(indexStatement, 0));
+        err = sqlite3_step(indexStatement);
+
+        if (err != SQLITE_ROW) break;
+
+        auto entry = RecordCategoryEntry();
+        entry.mCategoryName = categoryName;
+        entry.mRecordsExtraInfo = "hello here is my awesome extra info";
+
+        entries.push_back(entry);
+    }
+
+    ProcessError(sqlite3_finalize(indexStatement));
+
+    return entries;
 }
 
 void LibraryDB::CloseDatabase()

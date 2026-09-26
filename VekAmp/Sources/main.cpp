@@ -1,5 +1,6 @@
 #include "bassplayer.hpp"
 #include "librarydb.hpp"
+#include "libraryuibackend.hpp"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -13,7 +14,8 @@
 int main(int argc, char *argv[])
 {
     // Initialise BASSPlayer Singleton
-    BASS::BASSPlayer singleton = BASS::BASSPlayer();
+    BASS::BASSPlayer bassSingleton = BASS::BASSPlayer();
+    LibraryDB librarySingleton = LibraryDB();
 
     QGuiApplication app(argc, argv);
     app.setApplicationName("VekAmp");
@@ -27,6 +29,9 @@ int main(int argc, char *argv[])
 
     parser.process(app);
     const QStringList args = parser.positionalArguments();
+
+    // register necessary types
+    qmlRegisterType<RecordCategoryEntry>("com.vekAmp.recordStructs", 1, 0, "RecordCategoryEntry");
 
     QQmlApplicationEngine engine;
     QObject::connect(
