@@ -300,8 +300,13 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
 
             // Albums
             long long albumID = -32768;
+
+            TagLib::String titleTag = file.tag()->title();
+
             TagLib::String albumString = file.tag()->album();
             unsigned int trackYear = file.tag()->year();
+
+            if (albumString.isEmpty() && (!albumArtistString.isEmpty() || !artistString.isEmpty())) albumString = titleTag;
 
             if(!albumString.isEmpty())
             {
@@ -407,7 +412,6 @@ void LibraryDB::IndexNode(std::filesystem::path dirPath)
 
             sqlite3_stmt *updateStatement = nullptr;
 
-            TagLib::String titleTag = file.tag()->title();
             std::u8string u8filename = entry.path().stem().u8string();
 
             const char *title;
@@ -449,18 +453,46 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 {
     auto entries = std::vector<RecordCategoryEntry>();
 
+    const char *allRecordsCountQuery = R"(
+        SELECT Count(AlbumID) FROM Albums
+    )";
+
+    sqlite3_stmt *allRecStatement = nullptr;
+
+    ProcessError(sqlite3_prepare_v2(database, allRecordsCountQuery, strlen(allRecordsCountQuery), &allRecStatement, &allRecordsCountQuery));
+
+    ProcessError(sqlite3_step(allRecStatement));
+    long long count = sqlite3_column_int64(allRecStatement, 0);
+    ProcessError(sqlite3_step(allRecStatement));
+
+    ProcessError(sqlite3_finalize(allRecStatement));
+
     auto allCategoriesEntry = RecordCategoryEntry();
     allCategoriesEntry.mCategoryName = "All Artists";
-    allCategoriesEntry.mRecordsExtraInfo = "hello here is my awesome extra info";
+    allCategoriesEntry.mExtraInfo = std::to_string(count).append(count > 1 ? " records" : " record").c_str();
     entries.push_back(allCategoriesEntry);
+
+    const char *unknownRecordsCountQuery = R"(
+        SELECT Count(AlbumID) FROM Albums WHERE AlbumArtistID IS NULL
+    )";
+
+    sqlite3_stmt *unknowQueryStatement = nullptr;
+
+    ProcessError(sqlite3_prepare_v2(database, unknownRecordsCountQuery, strlen(unknownRecordsCountQuery), &unknowQueryStatement, &unknownRecordsCountQuery));
+
+    ProcessError(sqlite3_step(unknowQueryStatement));
+    count = sqlite3_column_int64(unknowQueryStatement, 0);
+    ProcessError(sqlite3_step(unknowQueryStatement));
+
+    ProcessError(sqlite3_finalize(unknowQueryStatement));
 
     auto unknownCategoriesEntry = RecordCategoryEntry();
     unknownCategoriesEntry.mCategoryName = "Unknown Artists";
-    unknownCategoriesEntry.mRecordsExtraInfo = "hello here is my awesome extra info";
+    unknownCategoriesEntry.mExtraInfo = std::to_string(count + 1).append(count > 0 ? " records" : " record").c_str();
     entries.push_back(unknownCategoriesEntry);
 
     const char *indexQuery = R"(
-        SELECT AlbumArtistName FROM AlbumArtists ORDER BY AlbumArtistName ASC
+        SELECT AlbumArtistName FROM AlbumArtists ORDER BY LOWER(AlbumArtistName) ASC
     )";
 
     sqlite3_stmt *indexStatement = nullptr;
@@ -474,9 +506,24 @@ std::vector<RecordCategoryEntry> LibraryDB::GetRecordCategoryEntries()
 
         if (err != SQLITE_ROW) break;
 
+        const char *countQuery = R"(
+            SELECT COUNT(AlbumID) FROM Albums JOIN AlbumArtists ON Albums.AlbumArtistID = AlbumArtists.AlbumArtistID WHERE AlbumArtistName = ?
+        )";
+
+        sqlite3_stmt *countStatement = nullptr;
+
+        ProcessError(sqlite3_prepare_v2(database, countQuery, strlen(countQuery), &countStatement, &countQuery));
+        ProcessError(sqlite3_bind_text(countStatement, 1, categoryName, -1, SQLITE_STATIC));
+
+        ProcessError(sqlite3_step(countStatement));
+        count = sqlite3_column_int64(countStatement, 0);
+        ProcessError(sqlite3_step(countStatement));
+
+        ProcessError(sqlite3_finalize(countStatement));
+
         auto entry = RecordCategoryEntry();
         entry.mCategoryName = categoryName;
-        entry.mRecordsExtraInfo = "hello here is my awesome extra info";
+        entry.mExtraInfo = std::to_string(count).append(count > 1 ? " records" : " record").c_str();
 
         entries.push_back(entry);
     }

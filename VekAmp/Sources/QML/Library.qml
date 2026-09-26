@@ -16,7 +16,7 @@ SplitView{
             for (var i = 0; i < qGetRecordCategoryCount(); i++)
             {
                 var entry = qGetRecordCategoryEntry(i);
-                categoryModel.append({categoryName: entry.categoryName})
+                categoryModel.append({categoryName: entry.categoryName, extraInfo: entry.extraInfo})
             }
 
             print("library refreshed!");
@@ -52,6 +52,7 @@ SplitView{
 
                 delegate: Frame {
                     required property string categoryName;
+                    required property string extraInfo;
                     required property int index;
 
                     id: categoryFrame
@@ -94,14 +95,29 @@ SplitView{
                             Layout.fillWidth: false
                         }
 
-                        Label{
-                            text: categoryName
+                        ColumnLayout{
                             Layout.fillWidth: true
-                            Layout.fillHeight: false
-                            Layout.alignment: Qt.AlignVCenter
-                            leftPadding: 4
-                            wrapMode: Text.NoWrap
-                            elide: Text.ElideRight
+                            Layout.alignment: Qt.AlignVCenter || Qt.AlignLeft
+                            spacing: 2
+
+                            Label{
+                                text: categoryName
+                                Layout.alignment: Qt.AlignLeft
+                                Layout.fillWidth: true
+                                //leftPadding: 4
+                                wrapMode: Text.NoWrap
+                                elide: Text.ElideRight
+                            }
+
+                            Label{
+                                text: extraInfo
+                                Layout.alignment: Qt.AlignLeft
+                                Layout.fillWidth: true
+                                //leftPadding: 4
+                                wrapMode: Text.NoWrap
+                                elide: Text.ElideRight
+                                color: "grey"
+                            }
                         }
 
                         focus: true

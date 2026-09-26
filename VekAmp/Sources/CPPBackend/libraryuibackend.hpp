@@ -9,11 +9,11 @@ struct RecordCategoryEntry{
     public:
         QString mCategoryName;
         QString mPicPath;
-        QString mRecordsExtraInfo; // amt records, or artist.
+        QString mExtraInfo; // amt records, or artist.
 
         Q_PROPERTY(QString categoryName MEMBER mCategoryName);
         Q_PROPERTY(QString picPath MEMBER mPicPath);
-        Q_PROPERTY(QString recordsExtraInfo MEMBER mRecordsExtraInfo);
+        Q_PROPERTY(QString extraInfo MEMBER mExtraInfo);
 };
 
 class LibraryUIBackend : public QObject

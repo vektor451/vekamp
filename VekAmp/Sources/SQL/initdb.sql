@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS CoverArts (
 	CoverArtModTime INTEGER
 );
 
+-- Records in general. Singles also count as albums.
 CREATE TABLE IF NOT EXISTS Albums (
 	AlbumID INTEGER PRIMARY KEY,
 	AlbumName TEXT NOT NULL,
